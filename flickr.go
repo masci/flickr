@@ -70,8 +70,7 @@ func GetRequestToken(api_key string, api_secret string) {
 
 	request := NewRequest(base_url, "GET", args)
 	// we don't have token secret at this stage, pass an empty string
-	signature := Sign(request, api_secret, "")
-	request.Args.Add("oauth_signature", url.QueryEscape(signature))
+	request.Args.Add("oauth_signature", Sign(request, api_secret, ""))
 
 	api_url := fmt.Sprintf("%s?%s", base_url, request.Args.Encode())
 	fmt.Println(api_url)
