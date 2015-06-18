@@ -22,16 +22,23 @@ func NewRequest(url string, method string, args url.Values) *Request {
 	return &r
 }
 
-func Sign(request *Request, consumer_secret string, token_secret string) string {
+func getSigningBaseString(request *Request) string {
 	request_url := url.QueryEscape(request.Url)
 	query := url.QueryEscape(request.Args.Encode())
-	key := fmt.Sprintf("%s&%s", consumer_secret, token_secret)
-	base_string := fmt.Sprintf("%s&%s&%s", request.Method, request_url, query)
+
+	return fmt.Sprintf("%s&%s&%s", request.Method, request_url, query)
+}
+
+func Sign(request *Request, consumer_secret string, token_secret string) string {
+	key := fmt.Sprintf("%s&%s", url.QueryEscape(consumer_secret), url.QueryEscape(token_secret))
+	base_string := getSigningBaseString(request)
 
 	mac := hmac.New(sha1.New, []byte(key))
 	mac.Write([]byte(base_string))
 
-	return base64.StdEncoding.EncodeToString(mac.Sum(nil))
+	ret := base64.StdEncoding.EncodeToString(mac.Sum(nil))
+
+	return ret
 }
 
 func generateNonce() string {
@@ -59,7 +66,7 @@ func GetRequestToken(api_key string, api_secret string) {
 
 	args := getDefaultArgs()
 	args.Add("oauth_consumer_key", api_key)
-	args.Add("oauth_callback", "http%3A%2F%2Fwww.example.com")
+	args.Add("oauth_callback", "oob")
 
 	request := NewRequest(base_url, "GET", args)
 	// we don't have token secret at this stage, pass an empty string
