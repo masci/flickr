@@ -52,16 +52,17 @@ func TestSign(t *testing.T) {
 }
 
 func TestParseRequestToken(t *testing.T) {
+	tok := RequestToken{}
 	in := "oauth_callback_confirmed=true&oauth_token=72157654304937659-8eedcda57d9d57e3&oauth_token_secret=8700d234e3fc00c6"
 	expected := RequestToken{true, "72157654304937659-8eedcda57d9d57e3", "8700d234e3fc00c6"}
 
-	rt, err := parseRequestToken(in)
+	err := tok.Parse(in)
 	if err != nil {
 		t.Error("Error:", err)
 	}
 
-	if *rt != expected {
-		t.Error("Expected", expected, "found", rt)
+	if tok != expected {
+		t.Error("Expected", expected, "found", tok)
 	}
 }
 

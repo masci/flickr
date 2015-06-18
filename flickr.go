@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -28,6 +29,20 @@ type RequestToken struct {
 	OauthCallbackConfirmed bool
 	OauthToken             string
 	OauthTokenSecret       string
+}
+
+func (rt *RequestToken) Parse(response string) error {
+	val, err := url.ParseQuery(response)
+	if err != nil {
+		return err
+	}
+
+	confirmed, _ := strconv.ParseBool(val.Get("oauth_callback_confirmed"))
+	rt.OauthCallbackConfirmed = confirmed
+	rt.OauthToken = val.Get("oauth_token")
+	rt.OauthTokenSecret = val.Get("oauth_token_secret")
+
+	return nil
 }
 
 func getSigningBaseString(request *Request) string {
@@ -69,18 +84,7 @@ func getDefaultArgs() url.Values {
 	return args
 }
 
-func parseRequestToken(response string) (*RequestToken, error) {
-	val, err := url.ParseQuery(response)
-	if err != nil {
-		return nil, err
-	}
-
-	confirmed, _ := strconv.ParseBool(val.Get("oauth_callback_confirmed"))
-	ret := RequestToken{confirmed, val.Get("oauth_token"), val.Get("oauth_token_secret")}
-	return &ret, nil
-}
-
-func GetRequestToken(api_key string, api_secret string) error {
+func GetRequestToken(api_key string, api_secret string) (*RequestToken, error) {
 	base_url := "https://www.flickr.com/services/oauth/request_token"
 
 	args := getDefaultArgs()
@@ -94,11 +98,23 @@ func GetRequestToken(api_key string, api_secret string) error {
 	api_url := fmt.Sprintf("%s?%s", base_url, request.Args.Encode())
 	res, err := http.Get(api_url)
 	if err != nil {
-		return err
+		return nil, err
 	}
+
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	token := RequestToken{}
+	token.Parse(string(body))
 
 	fmt.Println(api_url)
 	fmt.Println(res)
 
-	return nil
+	return &token, nil
+}
+
+func GetAuthorizeUrl() {
 }
