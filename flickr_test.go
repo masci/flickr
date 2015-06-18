@@ -50,3 +50,21 @@ func TestSign(t *testing.T) {
 		t.Error("Expected", expected, "found", signed)
 	}
 }
+
+func TestParseRequestToken(t *testing.T) {
+	in := "oauth_callback_confirmed=true&oauth_token=72157654304937659-8eedcda57d9d57e3&oauth_token_secret=8700d234e3fc00c6"
+	expected := RequestToken{true, "72157654304937659-8eedcda57d9d57e3", "8700d234e3fc00c6"}
+
+	rt, err := parseRequestToken(in)
+	if err != nil {
+		t.Error("Error:", err)
+	}
+
+	if *rt != expected {
+		t.Error("Expected", expected, "found", rt)
+	}
+}
+
+func TestGetRequestToken(t *testing.T) {
+	//GetRequestToken("a70c23170443bac2c189b92fc6439ef0", "82c542eaba4f56c9")
+}
