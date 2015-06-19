@@ -13,16 +13,19 @@ import (
 	"time"
 )
 
-type Request struct {
-	Url    string
-	Method string
-	Args   url.Values
+type FlickrClient struct {
+	ApiKey      string
+	ApiSecret   string
+	HTTPClient  *http.Client
+	EndpointUrl string
+	Method      string
+	Args        url.Values
 }
 
-func NewRequest(url string, method string, args url.Values) *Request {
-	r := Request{url, method, args}
-
-	return &r
+func (c *FlickrClient) Sign(tokenSecret string) {
+	// the "oauth_signature" param should not be included in the signing process
+	c.Args.Del("oauth_signature")
+	c.Args.Set("oauth_signature", getSignature(c, tokenSecret))
 }
 
 type RequestToken struct {
@@ -45,16 +48,16 @@ func (rt *RequestToken) Parse(response string) error {
 	return nil
 }
 
-func getSigningBaseString(request *Request) string {
-	request_url := url.QueryEscape(request.Url)
-	query := url.QueryEscape(request.Args.Encode())
+func getSigningBaseString(client *FlickrClient) string {
+	request_url := url.QueryEscape(client.EndpointUrl)
+	query := url.QueryEscape(client.Args.Encode())
 
-	return fmt.Sprintf("%s&%s&%s", request.Method, request_url, query)
+	return fmt.Sprintf("%s&%s&%s", client.Method, request_url, query)
 }
 
-func Sign(request *Request, consumer_secret string, token_secret string) string {
-	key := fmt.Sprintf("%s&%s", url.QueryEscape(consumer_secret), url.QueryEscape(token_secret))
-	base_string := getSigningBaseString(request)
+func getSignature(client *FlickrClient, token_secret string) string {
+	key := fmt.Sprintf("%s&%s", url.QueryEscape(client.ApiSecret), url.QueryEscape(token_secret))
+	base_string := getSigningBaseString(client)
 
 	mac := hmac.New(sha1.New, []byte(key))
 	mac.Write([]byte(base_string))
@@ -84,19 +87,17 @@ func getDefaultArgs() url.Values {
 	return args
 }
 
-func GetRequestToken(api_key string, api_secret string) (*RequestToken, error) {
-	base_url := "https://www.flickr.com/services/oauth/request_token"
-
+func GetRequestToken(client *FlickrClient) (*RequestToken, error) {
+	client.EndpointUrl = "https://www.flickr.com/services/oauth/request_token"
 	args := getDefaultArgs()
-	args.Add("oauth_consumer_key", api_key)
+	args.Add("oauth_consumer_key", client.ApiKey)
 	args.Add("oauth_callback", "oob")
 
-	request := NewRequest(base_url, "GET", args)
 	// we don't have token secret at this stage, pass an empty string
-	request.Args.Add("oauth_signature", Sign(request, api_secret, ""))
+	client.Sign("")
+	api_url := fmt.Sprintf("%s?%s", client.EndpointUrl, client.Args.Encode())
 
-	api_url := fmt.Sprintf("%s?%s", base_url, request.Args.Encode())
-	res, err := http.Get(api_url)
+	res, err := client.HTTPClient.Get(api_url)
 	if err != nil {
 		return nil, err
 	}
