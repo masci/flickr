@@ -39,6 +39,10 @@ func (c *FlickrClient) Sign(tokenSecret string) {
 	c.Args.Set("oauth_signature", getSignature(c, tokenSecret))
 }
 
+func (c *FlickrClient) GetUrl() string {
+	return fmt.Sprintf("%s?%s", c.EndpointUrl, c.Args.Encode())
+}
+
 type RequestToken struct {
 	OauthCallbackConfirmed bool
 	OauthToken             string
@@ -100,15 +104,14 @@ func getDefaultArgs() url.Values {
 
 func GetRequestToken(client *FlickrClient) (*RequestToken, error) {
 	client.EndpointUrl = "https://www.flickr.com/services/oauth/request_token"
-	args := getDefaultArgs()
-	args.Add("oauth_consumer_key", client.ApiKey)
-	args.Add("oauth_callback", "oob")
+	client.Args = getDefaultArgs()
+	client.Args.Set("oauth_consumer_key", client.ApiKey)
+	client.Args.Set("oauth_callback", "oob")
 
 	// we don't have token secret at this stage, pass an empty string
 	client.Sign("")
-	api_url := fmt.Sprintf("%s?%s", client.EndpointUrl, client.Args.Encode())
 
-	res, err := client.HTTPClient.Get(api_url)
+	res, err := client.HTTPClient.Get(client.GetUrl())
 	if err != nil {
 		return nil, err
 	}
