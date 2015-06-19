@@ -149,3 +149,11 @@ func TestGetRequestToken(t *testing.T) {
 	expect(t, tok.OauthToken, "72157654304937659-8eedcda57d9d57e3")
 	expect(t, tok.OauthTokenSecret, "8700d234e3fc00c6")
 }
+
+func TestGetUrl(t *testing.T) {
+	// TODO
+}
+
+func TestGetAuthorizeUrl(t *testing.T) {
+	// TODO
+}
