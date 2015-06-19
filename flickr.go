@@ -23,6 +23,16 @@ type FlickrClient struct {
 	Args        url.Values
 }
 
+func NewFlickrClient(apiKey string, apiSecret string) *FlickrClient {
+	return &FlickrClient{
+		ApiKey:     apiKey,
+		ApiSecret:  apiSecret,
+		HTTPClient: &http.Client{},
+		Method:     "GET",
+		Args:       url.Values{},
+	}
+}
+
 func (c *FlickrClient) Sign(tokenSecret string) {
 	// the "oauth_signature" param should not be included in the signing process
 	c.Args.Del("oauth_signature")
