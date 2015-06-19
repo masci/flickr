@@ -2,9 +2,19 @@ package flickr
 
 import (
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
+	"path"
+	"reflect"
 	"testing"
 )
+
+func expect(t *testing.T, a interface{}, b interface{}) {
+	if a != b {
+		t.Errorf("Expected %v (type %v) - Got %v (type %v)", b, reflect.TypeOf(b), a, reflect.TypeOf(a))
+	}
+}
 
 // testing keys were published at http://www.wackylabs.net/2011/12/oauth-and-flickr-part-2/
 func getTestClient() *FlickrClient {
@@ -24,6 +34,39 @@ func getTestClient() *FlickrClient {
 	}
 }
 
+// mock the Flickr API
+type RewriteTransport struct {
+	Transport http.RoundTripper
+	URL       *url.URL
+}
+
+func (t RewriteTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	req.URL.Scheme = t.URL.Scheme
+	req.URL.Host = t.URL.Host
+	req.URL.Path = path.Join(t.URL.Path, req.URL.Path)
+	rt := t.Transport
+	if rt == nil {
+		rt = http.DefaultTransport
+	}
+	return rt.RoundTrip(req)
+}
+
+func flickrMock(code int, body string, contentType string) (*httptest.Server, *http.Client) {
+	if contentType == "" {
+		contentType = "text/plain;charset=UTF-8"
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(code)
+		w.Header().Set("Content-Type", contentType)
+		fmt.Fprintln(w, body)
+	}))
+
+	u, _ := url.Parse(server.URL)
+
+	return server, &http.Client{Transport: RewriteTransport{URL: u}}
+}
+
 func TestGetSigningBaseString(t *testing.T) {
 	c := getTestClient()
 
@@ -35,9 +78,7 @@ func TestGetSigningBaseString(t *testing.T) {
 		"oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D1316657628%26" +
 		"oauth_version%3D1.0"
 
-	if ret != expected {
-		t.Error("Expected", expected, "found", ret)
-	}
+	expect(t, ret, expected)
 }
 
 func TestSign(t *testing.T) {
@@ -46,28 +87,19 @@ func TestSign(t *testing.T) {
 	c.Sign("token12345secret")
 	expected := "dXyfrCetFSTpzD3djSrkFhj0MIQ="
 	signed := c.Args.Get("oauth_signature")
-
-	if signed != expected {
-		t.Error("Expected", expected, "found", signed)
-	}
-	fmt.Println(signed)
+	expect(t, signed, expected)
 
 	// test empty token_secret
 	c.Sign("")
 	expected = "0fhNGlzpFNAsTme/hDfUb5HPB5U="
 	signed = c.Args.Get("oauth_signature")
-
-	if signed != expected {
-		t.Error("Expected", expected, "found", signed)
-	}
+	expect(t, signed, expected)
 }
 
 func TestGenerateNonce(t *testing.T) {
 	var nonce string
 	nonce = generateNonce()
-	if len(nonce) != 8 {
-		t.Error("Expected string with length of 8, found", nonce)
-	}
+	expect(t, 8, len(nonce))
 }
 
 func TestGetDefaultArgs(t *testing.T) {
@@ -91,13 +123,8 @@ func TestParseRequestToken(t *testing.T) {
 	expected := RequestToken{true, "72157654304937659-8eedcda57d9d57e3", "8700d234e3fc00c6"}
 
 	err := tok.Parse(in)
-	if err != nil {
-		t.Error("Error:", err)
-	}
-
-	if tok != expected {
-		t.Error("Expected", expected, "found", tok)
-	}
+	expect(t, nil, err)
+	expect(t, tok, expected)
 
 	err = tok.Parse("notA%%%ValidUrl")
 	if err == nil {
@@ -106,5 +133,19 @@ func TestParseRequestToken(t *testing.T) {
 }
 
 func TestGetRequestToken(t *testing.T) {
-	//GetRequestToken("a70c23170443bac2c189b92fc6439ef0", "82c542eaba4f56c9")
+	fclient := getTestClient()
+	mocked_body := "oauth_callback_confirmed=true&oauth_token=72157654304937659-8eedcda57d9d57e3&oauth_token_secret=8700d234e3fc00c6"
+	server, client := flickrMock(200, mocked_body, "")
+	defer server.Close()
+	// use the mocked client
+	fclient.HTTPClient = client
+
+	tok, err := GetRequestToken(fclient)
+	if err != nil {
+		t.Error("Unexpected error:", err)
+	}
+
+	expect(t, tok.OauthCallbackConfirmed, true)
+	expect(t, tok.OauthToken, "72157654304937659-8eedcda57d9d57e3")
+	expect(t, tok.OauthTokenSecret, "8700d234e3fc00c6")
 }
