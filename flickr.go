@@ -128,5 +128,10 @@ func GetRequestToken(client *FlickrClient) (*RequestToken, error) {
 	return &token, nil
 }
 
-func GetAuthorizeUrl() {
+func GetAuthorizeUrl(client *FlickrClient, reqToken *RequestToken) (string, error) {
+	client.EndpointUrl = "https://www.flickr.com/services/oauth/authorize"
+	client.Args = url.Values{}
+	client.Args.Set("oauth_token", reqToken.OauthToken)
+
+	return client.GetUrl(), nil
 }
