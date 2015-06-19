@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -35,7 +36,7 @@ type RequestToken struct {
 }
 
 func (rt *RequestToken) Parse(response string) error {
-	val, err := url.ParseQuery(response)
+	val, err := url.ParseQuery(strings.TrimSpace(response))
 	if err != nil {
 		return err
 	}
@@ -110,9 +111,6 @@ func GetRequestToken(client *FlickrClient) (*RequestToken, error) {
 
 	token := RequestToken{}
 	token.Parse(string(body))
-
-	fmt.Println(api_url)
-	fmt.Println(res)
 
 	return &token, nil
 }
