@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
+	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -45,6 +46,19 @@ func (c *FlickrClient) Sign(tokenSecret string) {
 
 func (c *FlickrClient) GetUrl() string {
 	return fmt.Sprintf("%s?%s", c.EndpointUrl, c.Args.Encode())
+}
+
+func (c *FlickrClient) ClearArgs() {
+	c.Args = url.Values{}
+}
+
+func (c *FlickrClient) SetDefaultArgs() {
+	c.Args = getDefaultArgs()
+}
+
+type FlickrResponse struct {
+	XMLName xml.Name `xml:"rsp"`
+	Status  string   `xml:"stat,attr"`
 }
 
 type RequestToken struct {
