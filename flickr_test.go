@@ -165,15 +165,14 @@ func TestNewFlickrClient(t *testing.T) {
 	expect(t, len(tok.Args), 0)
 }
 
-func TestParseOAuthToken(t *testing.T) {
+func TestNewOAuthToken(t *testing.T) {
 	response := "fullname=Jamal%20Fanaian" +
 		"&oauth_token=72157626318069415-087bfc7b5816092c" +
 		"&oauth_token_secret=a202d1f853ec69de" +
 		"&user_nsid=21207597%40N07" +
 		"&username=jamalfanaian"
 
-	tok := OAuthToken{}
-	tok.Parse(response)
+	tok, _ := NewOAuthToken(response)
 
 	expect(t, tok.OAuthToken, "72157626318069415-087bfc7b5816092c")
 	expect(t, tok.OAuthTokenSecret, "a202d1f853ec69de")
