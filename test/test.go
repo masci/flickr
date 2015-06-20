@@ -15,15 +15,15 @@ type LoginResponse struct {
 	}
 }
 
-func Login(client *flickr.FlickrClient, token *flickr.OAuthToken) (*LoginResponse, error) {
+func Login(client *flickr.FlickrClient) (*LoginResponse, error) {
 	client.EndpointUrl = flickr.API_ENDPOINT
 
 	client.SetDefaultArgs()
 	client.Args.Set("method", "flickr.test.login")
-	client.Args.Set("oauth_token", token.OAuthToken)
+	client.Args.Set("oauth_token", client.OAuthToken)
 	client.Args.Set("oauth_consumer_key", client.ApiKey)
 
-	client.Sign(token.OAuthTokenSecret)
+	client.Sign(client.OAuthTokenSecret)
 
 	res, err := client.HTTPClient.Get(client.GetUrl())
 	if err != nil {
