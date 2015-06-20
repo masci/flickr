@@ -14,12 +14,16 @@ import (
 	"time"
 )
 
+const (
+	API_ENDPOINT = "https://api.flickr.com/services/rest"
+)
+
 type FlickrClient struct {
 	ApiKey      string
 	ApiSecret   string
 	HTTPClient  *http.Client
 	EndpointUrl string
-	Method      string
+	HTTPVerb    string
 	Args        url.Values
 }
 
@@ -28,7 +32,7 @@ func NewFlickrClient(apiKey string, apiSecret string) *FlickrClient {
 		ApiKey:     apiKey,
 		ApiSecret:  apiSecret,
 		HTTPClient: &http.Client{},
-		Method:     "GET",
+		HTTPVerb:   "GET",
 		Args:       url.Values{},
 	}
 }
@@ -90,7 +94,7 @@ func getSigningBaseString(client *FlickrClient) string {
 	request_url := url.QueryEscape(client.EndpointUrl)
 	query := url.QueryEscape(client.Args.Encode())
 
-	return fmt.Sprintf("%s&%s&%s", client.Method, request_url, query)
+	return fmt.Sprintf("%s&%s&%s", client.HTTPVerb, request_url, query)
 }
 
 func getSignature(client *FlickrClient, token_secret string) string {

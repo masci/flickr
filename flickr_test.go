@@ -28,7 +28,7 @@ func getTestClient() *FlickrClient {
 
 	return &FlickrClient{
 		EndpointUrl: "http://www.flickr.com/services/oauth/request_token",
-		Method:      "GET",
+		HTTPVerb:    "GET",
 		Args:        args,
 		ApiSecret:   "1a3c208e172d3edc",
 	}
@@ -162,7 +162,7 @@ func TestNewFlickrClient(t *testing.T) {
 	tok := NewFlickrClient("apikey", "apisecret")
 	expect(t, tok.ApiKey, "apikey")
 	expect(t, tok.ApiSecret, "apisecret")
-	expect(t, tok.Method, "GET")
+	expect(t, tok.HTTPVerb, "GET")
 	expect(t, len(tok.Args), 0)
 }
 
