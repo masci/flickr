@@ -43,7 +43,7 @@ func NewFlickrClient(apiKey string, apiSecret string) *FlickrClient {
 func (c *FlickrClient) Sign(tokenSecret string) {
 	// the "oauth_signature" param should not be included in the signing process
 	c.Args.Del("oauth_signature")
-	c.Args.Set("oauth_signature", getSignature(c, tokenSecret))
+	c.Args.Set("oauth_signature", c.getSignature(tokenSecret))
 }
 
 func (c *FlickrClient) GetUrl() string {
@@ -56,6 +56,25 @@ func (c *FlickrClient) ClearArgs() {
 
 func (c *FlickrClient) SetDefaultArgs() {
 	c.Args = getDefaultArgs()
+}
+
+func (c *FlickrClient) getSigningBaseString() string {
+	request_url := url.QueryEscape(c.EndpointUrl)
+	query := url.QueryEscape(c.Args.Encode())
+
+	return fmt.Sprintf("%s&%s&%s", c.HTTPVerb, request_url, query)
+}
+
+func (c *FlickrClient) getSignature(token_secret string) string {
+	key := fmt.Sprintf("%s&%s", url.QueryEscape(c.ApiSecret), url.QueryEscape(token_secret))
+	base_string := c.getSigningBaseString()
+
+	mac := hmac.New(sha1.New, []byte(key))
+	mac.Write([]byte(base_string))
+
+	ret := base64.StdEncoding.EncodeToString(mac.Sum(nil))
+
+	return ret
 }
 
 type FlickrResponse struct {
@@ -107,25 +126,6 @@ func NewOAuthToken(response string) (*OAuthToken, error) {
 		UserNsid:         val.Get("user_nsid"),
 		Username:         val.Get("username"),
 	}, nil
-}
-
-func getSigningBaseString(client *FlickrClient) string {
-	request_url := url.QueryEscape(client.EndpointUrl)
-	query := url.QueryEscape(client.Args.Encode())
-
-	return fmt.Sprintf("%s&%s&%s", client.HTTPVerb, request_url, query)
-}
-
-func getSignature(client *FlickrClient, token_secret string) string {
-	key := fmt.Sprintf("%s&%s", url.QueryEscape(client.ApiSecret), url.QueryEscape(token_secret))
-	base_string := getSigningBaseString(client)
-
-	mac := hmac.New(sha1.New, []byte(key))
-	mac.Write([]byte(base_string))
-
-	ret := base64.StdEncoding.EncodeToString(mac.Sum(nil))
-
-	return ret
 }
 
 func generateNonce() string {
@@ -186,6 +186,7 @@ func GetAccessToken(client *FlickrClient, reqToken *RequestToken, oauthVerifier 
 	client.Args.Set("oauth_verifier", oauthVerifier)
 	client.Args.Set("oauth_consumer_key", client.ApiKey)
 	client.Args.Set("oauth_token", reqToken.OauthToken)
+	// use the request token for signing
 	client.Sign(reqToken.OauthTokenSecret)
 
 	res, err := client.HTTPClient.Get(client.GetUrl())

@@ -70,7 +70,7 @@ func flickrMock(code int, body string, contentType string) (*httptest.Server, *h
 func TestGetSigningBaseString(t *testing.T) {
 	c := getTestClient()
 
-	ret := getSigningBaseString(c)
+	ret := c.getSigningBaseString()
 	expected := "GET&http%3A%2F%2Fwww.flickr.com%2Fservices%2Foauth%2Frequest_token&" +
 		"oauth_callback%3Dhttp%253A%252F%252Fwww.wackylabs.net%252F" +
 		"oauth%252Ftest%26oauth_consumer_key%3D768fe946d252b119746fda82e1599980%26" +
