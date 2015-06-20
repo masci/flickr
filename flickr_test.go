@@ -150,10 +150,56 @@ func TestGetRequestToken(t *testing.T) {
 	expect(t, tok.OauthTokenSecret, "8700d234e3fc00c6")
 }
 
-func TestGetUrl(t *testing.T) {
-	// TODO
+func TestGetAuthorizeUrl(t *testing.T) {
+	client := getTestClient()
+	tok := &RequestToken{true, "token", "token_secret"}
+	url, err := GetAuthorizeUrl(client, tok)
+	expect(t, err, nil)
+	expect(t, url, "https://www.flickr.com/services/oauth/authorize?oauth_token=token&perms=delete")
 }
 
-func TestGetAuthorizeUrl(t *testing.T) {
-	// TODO
+func TestNewFlickrClient(t *testing.T) {
+	tok := NewFlickrClient("apikey", "apisecret")
+	expect(t, tok.ApiKey, "apikey")
+	expect(t, tok.ApiSecret, "apisecret")
+	expect(t, tok.Method, "GET")
+	expect(t, len(tok.Args), 0)
+}
+
+func TestParseOAuthToken(t *testing.T) {
+	response := "fullname=Jamal%20Fanaian" +
+		"&oauth_token=72157626318069415-087bfc7b5816092c" +
+		"&oauth_token_secret=a202d1f853ec69de" +
+		"&user_nsid=21207597%40N07" +
+		"&username=jamalfanaian"
+
+	tok := OAuthToken{}
+	tok.Parse(response)
+
+	expect(t, tok.OAuthToken, "72157626318069415-087bfc7b5816092c")
+	expect(t, tok.OAuthTokenSecret, "a202d1f853ec69de")
+	expect(t, tok.UserNsid, "21207597@N07")
+	expect(t, tok.Username, "jamalfanaian")
+	expect(t, tok.Fullname, "Jamal Fanaian")
+}
+
+func TestGetAccessToken(t *testing.T) {
+	body := "fullname=Jamal%20Fanaian" +
+		"&oauth_token=72157626318069415-087bfc7b5816092c" +
+		"&oauth_token_secret=a202d1f853ec69de" +
+		"&user_nsid=21207597%40N07" +
+		"&username=jamalfanaian"
+	fclient := getTestClient()
+
+	server, client := flickrMock(200, body, "")
+	defer server.Close()
+	// use the mocked client
+	fclient.HTTPClient = client
+
+	rt := &RequestToken{true, "token", "token_secret"}
+
+	_, err := GetAccessToken(fclient, rt, "fooVerifier")
+	if err != nil {
+		t.Error("Unexpected error:", err)
+	}
 }
