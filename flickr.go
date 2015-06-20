@@ -63,6 +63,29 @@ func (rt *RequestToken) Parse(response string) error {
 	return nil
 }
 
+type OAuthToken struct {
+	OAuthToken       string
+	OAuthTokenSecret string
+	UserNsid         string
+	Username         string
+	Fullname         string
+}
+
+func (ot *OAuthToken) Parse(response string) error {
+	val, err := url.ParseQuery(strings.TrimSpace(response))
+	if err != nil {
+		return err
+	}
+
+	ot.OAuthToken = val.Get("oauth_token")
+	ot.OAuthTokenSecret = val.Get("oauth_token_secret")
+	ot.Fullname = val.Get("fullname")
+	ot.UserNsid = val.Get("user_nsid")
+	ot.Username = val.Get("username")
+
+	return nil
+}
+
 func getSigningBaseString(client *FlickrClient) string {
 	request_url := url.QueryEscape(client.EndpointUrl)
 	query := url.QueryEscape(client.Args.Encode())
@@ -135,4 +158,29 @@ func GetAuthorizeUrl(client *FlickrClient, reqToken *RequestToken) (string, erro
 	client.Args.Set("perms", "delete")
 
 	return client.GetUrl(), nil
+}
+
+func GetAccessToken(client *FlickrClient, reqToken *RequestToken, oauthVerifier string) (*OAuthToken, error) {
+	client.EndpointUrl = "https://www.flickr.com/services/oauth/access_token"
+	client.Args = getDefaultArgs()
+	client.Args.Set("oauth_verifier", oauthVerifier)
+	client.Args.Set("oauth_consumer_key", client.ApiKey)
+	client.Args.Set("oauth_token", reqToken.OauthToken)
+	client.Sign(reqToken.OauthTokenSecret)
+
+	res, err := client.HTTPClient.Get(client.GetUrl())
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	tok := &OAuthToken{}
+	err = tok.Parse(string(body))
+
+	return tok, err
 }
