@@ -117,16 +117,15 @@ func TestGetDefaultArgs(t *testing.T) {
 	check("oauth_timestamp")
 }
 
-func TestParseRequestToken(t *testing.T) {
-	tok := RequestToken{}
+func TestNewRequestToken(t *testing.T) {
 	in := "oauth_callback_confirmed=true&oauth_token=72157654304937659-8eedcda57d9d57e3&oauth_token_secret=8700d234e3fc00c6"
 	expected := RequestToken{true, "72157654304937659-8eedcda57d9d57e3", "8700d234e3fc00c6"}
 
-	err := tok.Parse(in)
+	tok, err := NewRequestToken(in)
 	expect(t, nil, err)
-	expect(t, tok, expected)
+	expect(t, *tok, expected)
 
-	err = tok.Parse("notA%%%ValidUrl")
+	tok, err = NewRequestToken("notA%%%ValidUrl")
 	if err == nil {
 		t.Error("Parsing an invalid URL string should rise an error")
 	}

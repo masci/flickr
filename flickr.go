@@ -67,18 +67,20 @@ type RequestToken struct {
 	OauthTokenSecret       string
 }
 
-func (rt *RequestToken) Parse(response string) error {
+func NewRequestToken(response string) (*RequestToken, error) {
+	// TODO parse flickr errors inside the body
 	val, err := url.ParseQuery(strings.TrimSpace(response))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	confirmed, _ := strconv.ParseBool(val.Get("oauth_callback_confirmed"))
-	rt.OauthCallbackConfirmed = confirmed
-	rt.OauthToken = val.Get("oauth_token")
-	rt.OauthTokenSecret = val.Get("oauth_token_secret")
 
-	return nil
+	return &RequestToken{
+		confirmed,
+		val.Get("oauth_token"),
+		val.Get("oauth_token_secret"),
+	}, nil
 }
 
 type OAuthToken struct {
@@ -163,10 +165,7 @@ func GetRequestToken(client *FlickrClient) (*RequestToken, error) {
 		return nil, err
 	}
 
-	token := RequestToken{}
-	token.Parse(string(body))
-
-	return &token, nil
+	return NewRequestToken(string(body))
 }
 
 func GetAuthorizeUrl(client *FlickrClient, reqToken *RequestToken) (string, error) {
