@@ -20,12 +20,14 @@ const (
 )
 
 type FlickrClient struct {
-	ApiKey      string
-	ApiSecret   string
-	HTTPClient  *http.Client
-	EndpointUrl string
-	HTTPVerb    string
-	Args        url.Values
+	ApiKey           string
+	ApiSecret        string
+	HTTPClient       *http.Client
+	EndpointUrl      string
+	HTTPVerb         string
+	Args             url.Values
+	OAuthToken       string
+	OAuthTokenSecret string
 }
 
 func NewFlickrClient(apiKey string, apiSecret string) *FlickrClient {
