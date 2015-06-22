@@ -80,6 +80,15 @@ func (c *FlickrClient) getSignature(token_secret string) string {
 type FlickrResponse struct {
 	XMLName xml.Name `xml:"rsp"`
 	Status  string   `xml:"stat,attr"`
+	Error   struct {
+		XMLName xml.Name `xml:"err"`
+		Code    int      `xml:"code,attr"`
+		Message string   `xml:"msg,attr`
+	}
+}
+
+func (r *FlickrResponse) HasErrors() bool {
+	return r.Status == "fail"
 }
 
 type RequestToken struct {
