@@ -1,6 +1,7 @@
 package flickr
 
 import (
+	"encoding/xml"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -200,4 +201,45 @@ func TestGetAccessToken(t *testing.T) {
 	if err != nil {
 		t.Error("Unexpected error:", err)
 	}
+}
+
+func TestFlickrResponse(t *testing.T) {
+	type FooResponse struct {
+		FlickrResponse
+		Foo string `xml:"foo"`
+	}
+
+	failure := `<?xml version="1.0" encoding="utf-8" ?>
+<rsp stat="fail">
+  <err code="99" msg="Insufficient permissions. Method requires read privileges; none granted." />
+</rsp>
+`
+	resp := FooResponse{}
+	err := xml.Unmarshal([]byte(failure), &resp)
+	if err != nil {
+		t.Error("Error unmarsshalling", failure)
+	}
+
+	expect(t, resp.HasErrors(), true)
+	expect(t, resp.ErrorCode(), 99)
+	expect(t, resp.ErrorMsg(), "Insufficient permissions. Method requires read privileges; none granted.")
+
+	ok := `<?xml version="1.0" encoding="utf-8" ?>
+<rsp stat="ok">
+  <user id="23148015@N00">
+    <username>Massimiliano Pippi</username>
+  </user>
+  <foo>Foo!</foo>
+</rsp>`
+
+	resp = FooResponse{}
+	err = xml.Unmarshal([]byte(ok), &resp)
+	if err != nil {
+		t.Error("Error unmarsshalling", ok)
+	}
+
+	expect(t, resp.HasErrors(), false)
+	expect(t, resp.Foo, "Foo!")
+	expect(t, resp.ErrorCode(), 0)
+	expect(t, resp.ErrorMsg(), "")
 }
