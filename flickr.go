@@ -83,12 +83,20 @@ type FlickrResponse struct {
 	Error   struct {
 		XMLName xml.Name `xml:"err"`
 		Code    int      `xml:"code,attr"`
-		Message string   `xml:"msg,attr`
+		Message string   `xml:"msg,attr"`
 	}
 }
 
 func (r *FlickrResponse) HasErrors() bool {
 	return r.Status == "fail"
+}
+
+func (r *FlickrResponse) ErrorCode() int {
+	return r.Error.Code
+}
+
+func (r *FlickrResponse) ErrorMsg() string {
+	return r.Error.Message
 }
 
 type RequestToken struct {
