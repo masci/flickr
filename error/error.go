@@ -1,31 +1,16 @@
 package error
 
+// TODO
+// here define ONLY errors from the library NOT from flickr
+// error from flickr have already a code and a message that are returned
+// along with the HTTP Response
+
 const (
-	SSLIsRequired             = 95
-	InvalidSignature          = 96
-	MissingSignature          = 97
-	LoginFailed               = 98
-	UserNotLoggedIn           = 99
-	InvalidAPIKey             = 100
-	ServiceCurrentUnavailable = 105
-	WriteOperationFailed      = 106
-	FormatNotFound            = 111
-	MethodNotFound            = 112
-	BadURLFound               = 116
+	FooError = 1
 )
 
 var errors = map[int]string{
-	SSLIsRequired:             "SSL is required to access the Flickr API.",
-	InvalidSignature:          "The passed signature was invalid.",
-	MissingSignature:          "The call required signing but no signature was sent.",
-	LoginFailed:               "The login details or auth token passed were invalid.",
-	UserNotLoggedIn:           "The login details or auth token passed were invalid.",
-	InvalidAPIKey:             "The login details or auth token passed were invalid.",
-	ServiceCurrentUnavailable: "The login details or auth token passed were invalid.",
-	WriteOperationFailed:      "The login details or auth token passed were invalid.",
-	FormatNotFound:            "The login details or auth token passed were invalid.",
-	MethodNotFound:            "The login details or auth token passed were invalid.",
-	BadURLFound:               "The login details or auth token passed were invalid.",
+	FooError: "This error is Foo.",
 }
 
 type Error struct {
