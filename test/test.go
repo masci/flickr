@@ -3,6 +3,7 @@ package test
 import (
 	"encoding/xml"
 	"github.com/masci/flick-rsync/flickr"
+	flickErr "github.com/masci/flick-rsync/flickr/error"
 	"io/ioutil"
 )
 
@@ -42,7 +43,9 @@ func Login(client *flickr.FlickrClient) (*LoginResponse, error) {
 		return nil, err
 	}
 
-	// TODO parse flickr errors
+	if loginResponse.HasErrors() {
+		err = flickErr.NewError(10)
+	}
 
 	return &loginResponse, nil
 }
