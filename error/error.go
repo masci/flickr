@@ -6,16 +6,21 @@ package error
 // along with the HTTP Response
 
 const (
-	FooError = 1
+	ApiError = 10
 )
 
 var errors = map[int]string{
-	FooError: "This error is Foo.",
+	ApiError: "Flickr API returned an error, check the response for details",
 }
 
 type Error struct {
 	ErrorCode int
 	Message   string
+}
+
+// Implement error interface
+func (e Error) Error() string {
+	return e.Message
 }
 
 func NewError(errorCode int) *Error {
