@@ -10,14 +10,14 @@ import (
 	"testing"
 )
 
-func expect(t *testing.T, a interface{}, b interface{}) {
+func Expect(t *testing.T, a interface{}, b interface{}) {
 	if a != b {
 		t.Errorf("Expected %v (type %v) - Got %v (type %v)", b, reflect.TypeOf(b), a, reflect.TypeOf(a))
 	}
 }
 
 // testing keys were published at http://www.wackylabs.net/2011/12/oauth-and-flickr-part-2/
-func getTestClient() *FlickrClient {
+func GetTestClient() *FlickrClient {
 	args := url.Values{}
 	args.Set("oauth_nonce", "C2F26CD5C075BA9050AD8EE90644CF29")
 	args.Set("oauth_timestamp", "1316657628")
@@ -51,7 +51,7 @@ func (t RewriteTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	return rt.RoundTrip(req)
 }
 
-func flickrMock(code int, body string, contentType string) (*httptest.Server, *http.Client) {
+func FlickrMock(code int, body string, contentType string) (*httptest.Server, *http.Client) {
 	if contentType == "" {
 		contentType = "text/plain;charset=UTF-8"
 	}
