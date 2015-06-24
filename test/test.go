@@ -17,7 +17,7 @@ type LoginResponse struct {
 }
 
 func Login(client *flickr.FlickrClient) (*LoginResponse, error) {
-	client.EndpointUrl = flickr.API_ENDPOINT
+	client.EndpointUrl = flickr.API_ENDPOINT // TODO move to SetDefaultArgs
 
 	client.SetDefaultArgs()
 	client.Args.Set("method", "flickr.test.login")
@@ -44,8 +44,42 @@ func Login(client *flickr.FlickrClient) (*LoginResponse, error) {
 	}
 
 	if loginResponse.HasErrors() {
-		err = flickErr.NewError(10)
+		return &loginResponse, flickErr.NewError(10)
 	}
 
 	return &loginResponse, nil
+}
+
+func Null(client *flickr.FlickrClient) (*flickr.FlickrResponse, error) {
+	client.EndpointUrl = flickr.API_ENDPOINT
+	client.SetDefaultArgs()
+	client.Args.Set("method", "flickr.test.null")
+	client.Args.Set("oauth_token", client.OAuthToken)
+	client.Args.Set("oauth_consumer_key", client.ApiKey)
+
+	client.Sign(client.OAuthTokenSecret)
+
+	res, err := client.HTTPClient.Get(client.GetUrl())
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	response := flickr.FlickrResponse{}
+
+	err = xml.Unmarshal([]byte(body), &response)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.HasErrors() {
+		return &response, flickErr.NewError(10)
+	}
+
+	return &response, nil
 }
