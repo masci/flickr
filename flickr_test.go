@@ -6,7 +6,7 @@ import (
 )
 
 func TestGetSigningBaseString(t *testing.T) {
-	c := getTestClient()
+	c := GetTestClient()
 
 	ret := c.getSigningBaseString()
 	expected := "GET&http%3A%2F%2Fwww.flickr.com%2Fservices%2Foauth%2Frequest_token&" +
@@ -16,28 +16,28 @@ func TestGetSigningBaseString(t *testing.T) {
 		"oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D1316657628%26" +
 		"oauth_version%3D1.0"
 
-	expect(t, ret, expected)
+	Expect(t, ret, expected)
 }
 
 func TestSign(t *testing.T) {
-	c := getTestClient()
+	c := GetTestClient()
 
 	c.Sign("token12345secret")
 	expected := "dXyfrCetFSTpzD3djSrkFhj0MIQ="
 	signed := c.Args.Get("oauth_signature")
-	expect(t, signed, expected)
+	Expect(t, signed, expected)
 
 	// test empty token_secret
 	c.Sign("")
 	expected = "0fhNGlzpFNAsTme/hDfUb5HPB5U="
 	signed = c.Args.Get("oauth_signature")
-	expect(t, signed, expected)
+	Expect(t, signed, expected)
 }
 
 func TestGenerateNonce(t *testing.T) {
 	var nonce string
 	nonce = generateNonce()
-	expect(t, 8, len(nonce))
+	Expect(t, 8, len(nonce))
 }
 
 func TestGetDefaultArgs(t *testing.T) {
@@ -60,8 +60,8 @@ func TestNewRequestToken(t *testing.T) {
 	expected := RequestToken{true, "72157654304937659-8eedcda57d9d57e3", "8700d234e3fc00c6"}
 
 	tok, err := NewRequestToken(in)
-	expect(t, nil, err)
-	expect(t, *tok, expected)
+	Expect(t, nil, err)
+	Expect(t, *tok, expected)
 
 	tok, err = NewRequestToken("notA%%%ValidUrl")
 	if err == nil {
@@ -70,9 +70,9 @@ func TestNewRequestToken(t *testing.T) {
 }
 
 func TestGetRequestToken(t *testing.T) {
-	fclient := getTestClient()
+	fclient := GetTestClient()
 	mocked_body := "oauth_callback_confirmed=true&oauth_token=72157654304937659-8eedcda57d9d57e3&oauth_token_secret=8700d234e3fc00c6"
-	server, client := flickrMock(200, mocked_body, "")
+	server, client := FlickrMock(200, mocked_body, "")
 	defer server.Close()
 	// use the mocked client
 	fclient.HTTPClient = client
@@ -82,25 +82,25 @@ func TestGetRequestToken(t *testing.T) {
 		t.Error("Unexpected error:", err)
 	}
 
-	expect(t, tok.OauthCallbackConfirmed, true)
-	expect(t, tok.OauthToken, "72157654304937659-8eedcda57d9d57e3")
-	expect(t, tok.OauthTokenSecret, "8700d234e3fc00c6")
+	Expect(t, tok.OauthCallbackConfirmed, true)
+	Expect(t, tok.OauthToken, "72157654304937659-8eedcda57d9d57e3")
+	Expect(t, tok.OauthTokenSecret, "8700d234e3fc00c6")
 }
 
 func TestGetAuthorizeUrl(t *testing.T) {
-	client := getTestClient()
+	client := GetTestClient()
 	tok := &RequestToken{true, "token", "token_secret"}
 	url, err := GetAuthorizeUrl(client, tok)
-	expect(t, err, nil)
-	expect(t, url, "https://www.flickr.com/services/oauth/authorize?oauth_token=token&perms=delete")
+	Expect(t, err, nil)
+	Expect(t, url, "https://www.flickr.com/services/oauth/authorize?oauth_token=token&perms=delete")
 }
 
 func TestNewFlickrClient(t *testing.T) {
 	tok := NewFlickrClient("apikey", "apisecret")
-	expect(t, tok.ApiKey, "apikey")
-	expect(t, tok.ApiSecret, "apisecret")
-	expect(t, tok.HTTPVerb, "GET")
-	expect(t, len(tok.Args), 0)
+	Expect(t, tok.ApiKey, "apikey")
+	Expect(t, tok.ApiSecret, "apisecret")
+	Expect(t, tok.HTTPVerb, "GET")
+	Expect(t, len(tok.Args), 0)
 }
 
 func TestNewOAuthToken(t *testing.T) {
@@ -112,11 +112,11 @@ func TestNewOAuthToken(t *testing.T) {
 
 	tok, _ := NewOAuthToken(response)
 
-	expect(t, tok.OAuthToken, "72157626318069415-087bfc7b5816092c")
-	expect(t, tok.OAuthTokenSecret, "a202d1f853ec69de")
-	expect(t, tok.UserNsid, "21207597@N07")
-	expect(t, tok.Username, "jamalfanaian")
-	expect(t, tok.Fullname, "Jamal Fanaian")
+	Expect(t, tok.OAuthToken, "72157626318069415-087bfc7b5816092c")
+	Expect(t, tok.OAuthTokenSecret, "a202d1f853ec69de")
+	Expect(t, tok.UserNsid, "21207597@N07")
+	Expect(t, tok.Username, "jamalfanaian")
+	Expect(t, tok.Fullname, "Jamal Fanaian")
 }
 
 func TestGetAccessToken(t *testing.T) {
@@ -125,9 +125,9 @@ func TestGetAccessToken(t *testing.T) {
 		"&oauth_token_secret=a202d1f853ec69de" +
 		"&user_nsid=21207597%40N07" +
 		"&username=jamalfanaian"
-	fclient := getTestClient()
+	fclient := GetTestClient()
 
-	server, client := flickrMock(200, body, "")
+	server, client := FlickrMock(200, body, "")
 	defer server.Close()
 	// use the mocked client
 	fclient.HTTPClient = client
@@ -157,9 +157,9 @@ func TestFlickrResponse(t *testing.T) {
 		t.Error("Error unmarsshalling", failure)
 	}
 
-	expect(t, resp.HasErrors(), true)
-	expect(t, resp.ErrorCode(), 99)
-	expect(t, resp.ErrorMsg(), "Insufficient permissions. Method requires read privileges; none granted.")
+	Expect(t, resp.HasErrors(), true)
+	Expect(t, resp.ErrorCode(), 99)
+	Expect(t, resp.ErrorMsg(), "Insufficient permissions. Method requires read privileges; none granted.")
 
 	ok := `<?xml version="1.0" encoding="utf-8" ?>
 <rsp stat="ok">
@@ -175,8 +175,8 @@ func TestFlickrResponse(t *testing.T) {
 		t.Error("Error unmarsshalling", ok)
 	}
 
-	expect(t, resp.HasErrors(), false)
-	expect(t, resp.Foo, "Foo!")
-	expect(t, resp.ErrorCode(), 0)
-	expect(t, resp.ErrorMsg(), "")
+	Expect(t, resp.HasErrors(), false)
+	Expect(t, resp.Foo, "Foo!")
+	Expect(t, resp.ErrorCode(), 0)
+	Expect(t, resp.ErrorMsg(), "")
 }
