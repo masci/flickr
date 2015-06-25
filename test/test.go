@@ -16,6 +16,13 @@ type LoginResponse struct {
 	}
 }
 
+type EchoResponse struct {
+	flickr.FlickrResponse
+	Method string `xml:"method"`
+	ApiKey string `xml:"api_key"`
+	Format string `xml:"format"`
+}
+
 func Login(client *flickr.FlickrClient) (*LoginResponse, error) {
 	client.EndpointUrl = flickr.API_ENDPOINT // TODO move to SetDefaultArgs
 
@@ -84,16 +91,8 @@ func Null(client *flickr.FlickrClient) (*flickr.FlickrResponse, error) {
 	return &response, nil
 }
 
-type EchoResponse struct {
-	flickr.FlickrResponse
-	Method string `xml:"method"`
-	ApiKey string `xml:"api_key"`
-	Format string `xml:"format"`
-}
-
 func Echo(client *flickr.FlickrClient) (*EchoResponse, error) {
 	client.EndpointUrl = flickr.API_ENDPOINT
-	client.SetDefaultArgs()
 	client.Args.Set("method", "flickr.test.echo")
 	client.Args.Set("oauth_consumer_key", client.ApiKey)
 
