@@ -103,3 +103,32 @@ func TestNull(t *testing.T) {
 
 	flickr.Expect(t, resp.HasErrors(), false)
 }
+
+func TestEchoKo(t *testing.T) {
+
+}
+
+func TestEcho(t *testing.T) {
+	body := `<?xml version="1.0" encoding="utf-8" ?>
+	<rsp stat="ok">
+	  <method>flickr.test.echo</method>
+	  <api_key>39b06b284accf3e6834be415feb395ae</api_key>
+	  <format>rest</format>
+	</rsp>`
+
+	fclient := flickr.GetTestClient()
+	server, client := flickr.FlickrMock(200, body, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	resp, err := Echo(fclient)
+
+	if err != nil {
+		t.Error("Unexpected error", err)
+	}
+
+	flickr.Expect(t, resp.HasErrors(), false)
+	flickr.Expect(t, resp.Method, "flickr.test.echo")
+	flickr.Expect(t, resp.ApiKey, "39b06b284accf3e6834be415feb395ae")
+	flickr.Expect(t, resp.Format, "rest")
+}

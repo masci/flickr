@@ -83,3 +83,41 @@ func Null(client *flickr.FlickrClient) (*flickr.FlickrResponse, error) {
 
 	return &response, nil
 }
+
+type EchoResponse struct {
+	flickr.FlickrResponse
+	Method string `xml:"method"`
+	ApiKey string `xml:"api_key"`
+	Format string `xml:"format"`
+}
+
+func Echo(client *flickr.FlickrClient) (*EchoResponse, error) {
+	client.EndpointUrl = flickr.API_ENDPOINT
+	client.SetDefaultArgs()
+	client.Args.Set("method", "flickr.test.echo")
+	client.Args.Set("oauth_consumer_key", client.ApiKey)
+
+	res, err := client.HTTPClient.Get(client.GetUrl())
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	response := EchoResponse{}
+
+	err = xml.Unmarshal([]byte(body), &response)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.HasErrors() {
+		return &response, flickErr.NewError(10)
+	}
+
+	return &response, nil
+}
