@@ -167,7 +167,7 @@ func getDefaultArgs() url.Values {
 
 func GetRequestToken(client *FlickrClient) (*RequestToken, error) {
 	client.EndpointUrl = "https://www.flickr.com/services/oauth/request_token"
-	client.Args = getDefaultArgs()
+	client.SetDefaultArgs()
 	client.Args.Set("oauth_consumer_key", client.ApiKey)
 	client.Args.Set("oauth_callback", "oob")
 
@@ -199,7 +199,7 @@ func GetAuthorizeUrl(client *FlickrClient, reqToken *RequestToken) (string, erro
 
 func GetAccessToken(client *FlickrClient, reqToken *RequestToken, oauthVerifier string) (*OAuthToken, error) {
 	client.EndpointUrl = "https://www.flickr.com/services/oauth/access_token"
-	client.Args = getDefaultArgs()
+	client.SetDefaultArgs()
 	client.Args.Set("oauth_verifier", oauthVerifier)
 	client.Args.Set("oauth_consumer_key", client.ApiKey)
 	client.Args.Set("oauth_token", reqToken.OauthToken)
