@@ -8,11 +8,13 @@ package error
 const (
 	ApiError          = 10
 	RequestTokenError = 20
+	OAuthTokenError   = 30
 )
 
 var errors = map[int]string{
 	ApiError:          "Flickr API returned an error, check the response for details",
 	RequestTokenError: "An error occurred during token request, check the response for details",
+	OAuthTokenError:   "An error occurred while getting the OAuth token, check the response for details",
 }
 
 type Error struct {
