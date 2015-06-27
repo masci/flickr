@@ -132,7 +132,7 @@ func TestNewOAuthToken(t *testing.T) {
 		"&user_nsid=21207597%40N07" +
 		"&username=jamalfanaian"
 
-	tok, _ := NewOAuthToken(response)
+	tok, _ := ParseOAuthToken(response)
 
 	Expect(t, tok.OAuthToken, "72157626318069415-087bfc7b5816092c")
 	Expect(t, tok.OAuthTokenSecret, "a202d1f853ec69de")
