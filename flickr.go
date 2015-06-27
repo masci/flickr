@@ -144,10 +144,14 @@ func (r *FlickrResponse) ErrorMsg() string {
 
 // Type representing a request token during the exchange process
 type RequestToken struct {
+	// Whether the callback url matches the one provided in Flickr dashboard
 	OauthCallbackConfirmed bool
-	OauthToken             string
-	OauthTokenSecret       string
-	OAuthProblem           string
+	// Request token
+	OauthToken string
+	// Request token secret
+	OauthTokenSecret string
+	// OAuth failing reason in case of errors
+	OAuthProblem string
 }
 
 // Extract a RequestToken from the response body
@@ -173,15 +177,23 @@ func ParseRequestToken(response string) (*RequestToken, error) {
 	return ret, nil
 }
 
+// Type representing a OAuth access token along with its owner's data
 type OAuthToken struct {
-	OAuthToken       string
+	// OAuth access token
+	OAuthToken string
+	// OAuth access token secret
 	OAuthTokenSecret string
-	UserNsid         string
-	Username         string
-	Fullname         string
-	OAuthProblem     string
+	// Flickr ID of token's owner
+	UserNsid string
+	// Flickr Username of token's owner
+	Username string
+	// Flickr full name of token's owner
+	Fullname string
+	// OAuth failing reason in case of errors
+	OAuthProblem string
 }
 
+// Extract a OAuthToken from the response body
 func ParseOAuthToken(response string) (*OAuthToken, error) {
 	val, err := url.ParseQuery(strings.TrimSpace(response))
 	if err != nil {
