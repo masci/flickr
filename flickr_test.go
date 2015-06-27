@@ -40,10 +40,11 @@ func TestGenerateNonce(t *testing.T) {
 	Expect(t, 8, len(nonce))
 }
 
-func TestGetDefaultArgs(t *testing.T) {
-	args := getDefaultArgs()
+func TestSetDefaultArgs(t *testing.T) {
+	c := GetTestClient()
+	c.SetDefaultArgs()
 	check := func(key string) {
-		val := args.Get(key)
+		val := c.Args.Get(key)
 		if val == "" {
 			t.Error("Found empty string for", key)
 		}
