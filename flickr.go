@@ -16,7 +16,10 @@ import (
 )
 
 const (
-	API_ENDPOINT = "https://api.flickr.com/services/rest"
+	API_ENDPOINT      = "https://api.flickr.com/services/rest"
+	AUTHORIZE_URL     = "https://www.flickr.com/services/oauth/authorize"
+	REQUEST_TOKEN_URL = "https://www.flickr.com/services/oauth/request_token"
+	ACCESS_TOKEN_URL  = "https://www.flickr.com/services/oauth/access_token"
 )
 
 // Generate a random string of 8 chars, needed for OAuth signature
@@ -31,17 +34,28 @@ func generateNonce() string {
 	return string(b)
 }
 
+// An utility type to wrap all resources and data needed to complete requests
+// to the Flickr API
 type FlickrClient struct {
-	ApiKey           string
-	ApiSecret        string
-	HTTPClient       *http.Client
-	EndpointUrl      string
-	HTTPVerb         string
-	Args             url.Values
-	OAuthToken       string
+	// Flickr application api key
+	ApiKey string
+	// Flickr application api secret
+	ApiSecret string
+	// A generic HTTP client to perform GET and POST requests
+	HTTPClient *http.Client
+	// The base url for API endpoints
+	EndpointUrl string
+	// A string containing POST or GET, needed for OAuth signing
+	HTTPVerb string
+	// A set of url params to query the API
+	Args url.Values
+	// User access token
+	OAuthToken string
+	// User secret token
 	OAuthTokenSecret string
 }
 
+// Create a Flickr client, apiKey and apiSecret are mandatory
 func NewFlickrClient(apiKey string, apiSecret string) *FlickrClient {
 	return &FlickrClient{
 		ApiKey:     apiKey,
@@ -59,10 +73,12 @@ func (c *FlickrClient) Sign(tokenSecret string) {
 	c.Args.Set("oauth_signature", c.getSignature(tokenSecret))
 }
 
+// Evaluate the complete URL to make requests (base url + params)
 func (c *FlickrClient) GetUrl() string {
 	return fmt.Sprintf("%s?%s", c.EndpointUrl, c.Args.Encode())
 }
 
+// Remove all query params
 func (c *FlickrClient) ClearArgs() {
 	c.Args = url.Values{}
 }
@@ -76,6 +92,7 @@ func (c *FlickrClient) SetDefaultArgs() {
 	c.Args.Add("oauth_timestamp", fmt.Sprintf("%d", time.Now().Unix()))
 }
 
+// Get the base string to compose the signature
 func (c *FlickrClient) getSigningBaseString() string {
 	request_url := url.QueryEscape(c.EndpointUrl)
 	query := url.QueryEscape(c.Args.Encode())
@@ -83,6 +100,7 @@ func (c *FlickrClient) getSigningBaseString() string {
 	return fmt.Sprintf("%s&%s&%s", c.HTTPVerb, request_url, query)
 }
 
+// Compute the signature of a signed request
 func (c *FlickrClient) getSignature(token_secret string) string {
 	key := fmt.Sprintf("%s&%s", url.QueryEscape(c.ApiSecret), url.QueryEscape(token_secret))
 	base_string := c.getSigningBaseString()
@@ -95,28 +113,35 @@ func (c *FlickrClient) getSignature(token_secret string) string {
 	return ret
 }
 
+// Base type representing responses from Flickr API
 type FlickrResponse struct {
 	XMLName xml.Name `xml:"rsp"`
-	Status  string   `xml:"stat,attr"`
-	Error   struct {
+	// Status might contain "err" or "ok" strings
+	Status string `xml:"stat,attr"`
+	// Flickr API error detail
+	Error struct {
 		XMLName xml.Name `xml:"err"`
 		Code    int      `xml:"code,attr"`
 		Message string   `xml:"msg,attr"`
 	}
 }
 
+// Return whether a response contains errors
 func (r *FlickrResponse) HasErrors() bool {
 	return r.Status == "fail"
 }
 
+// Return the error code (0 if no errors)
 func (r *FlickrResponse) ErrorCode() int {
 	return r.Error.Code
 }
 
+// Return error message string (empty string if no errors)
 func (r *FlickrResponse) ErrorMsg() string {
 	return r.Error.Message
 }
 
+// Type representing a request token during the exchange process
 type RequestToken struct {
 	OauthCallbackConfirmed bool
 	OauthToken             string
@@ -164,7 +189,7 @@ func NewOAuthToken(response string) (*OAuthToken, error) {
 }
 
 func GetRequestToken(client *FlickrClient) (*RequestToken, error) {
-	client.EndpointUrl = "https://www.flickr.com/services/oauth/request_token"
+	client.EndpointUrl = REQUEST_TOKEN_URL
 	client.SetDefaultArgs()
 	client.Args.Set("oauth_consumer_key", client.ApiKey)
 	client.Args.Set("oauth_callback", "oob")
@@ -187,7 +212,7 @@ func GetRequestToken(client *FlickrClient) (*RequestToken, error) {
 }
 
 func GetAuthorizeUrl(client *FlickrClient, reqToken *RequestToken) (string, error) {
-	client.EndpointUrl = "https://www.flickr.com/services/oauth/authorize"
+	client.EndpointUrl = AUTHORIZE_URL
 	client.Args = url.Values{}
 	client.Args.Set("oauth_token", reqToken.OauthToken)
 	client.Args.Set("perms", "delete")
@@ -196,7 +221,7 @@ func GetAuthorizeUrl(client *FlickrClient, reqToken *RequestToken) (string, erro
 }
 
 func GetAccessToken(client *FlickrClient, reqToken *RequestToken, oauthVerifier string) (*OAuthToken, error) {
-	client.EndpointUrl = "https://www.flickr.com/services/oauth/access_token"
+	client.EndpointUrl = ACCESS_TOKEN_URL
 	client.SetDefaultArgs()
 	client.Args.Set("oauth_verifier", oauthVerifier)
 	client.Args.Set("oauth_consumer_key", client.ApiKey)
