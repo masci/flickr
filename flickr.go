@@ -19,6 +19,18 @@ const (
 	API_ENDPOINT = "https://api.flickr.com/services/rest"
 )
 
+// Generate a random string of 8 chars, needed for OAuth signature
+func generateNonce() string {
+	rand.Seed(time.Now().UTC().UnixNano())
+	// For convenience, use a set of chars we don't need to url-escape
+	var letters = []rune("123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ")
+	b := make([]rune, 8)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
+}
+
 type FlickrClient struct {
 	ApiKey           string
 	ApiSecret        string
@@ -40,8 +52,9 @@ func NewFlickrClient(apiKey string, apiSecret string) *FlickrClient {
 	}
 }
 
+// Sign the next request performed by the FlickrClient
 func (c *FlickrClient) Sign(tokenSecret string) {
-	// the "oauth_signature" param should not be included in the signing process
+	// the "oauth_signature" param must not be included in the signing process
 	c.Args.Del("oauth_signature")
 	c.Args.Set("oauth_signature", c.getSignature(tokenSecret))
 }
@@ -54,8 +67,13 @@ func (c *FlickrClient) ClearArgs() {
 	c.Args = url.Values{}
 }
 
+// Set a default set of args needed for signing a request
 func (c *FlickrClient) SetDefaultArgs() {
-	c.Args = getDefaultArgs()
+	c.Args = url.Values{}
+	c.Args.Add("oauth_version", "1.0")
+	c.Args.Add("oauth_signature_method", "HMAC-SHA1")
+	c.Args.Add("oauth_nonce", generateNonce())
+	c.Args.Add("oauth_timestamp", fmt.Sprintf("%d", time.Now().Unix()))
 }
 
 func (c *FlickrClient) getSigningBaseString() string {
@@ -143,26 +161,6 @@ func NewOAuthToken(response string) (*OAuthToken, error) {
 		UserNsid:         val.Get("user_nsid"),
 		Username:         val.Get("username"),
 	}, nil
-}
-
-func generateNonce() string {
-	rand.Seed(time.Now().UTC().UnixNano())
-	var letters = []rune("123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ")
-	b := make([]rune, 8)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
-}
-
-func getDefaultArgs() url.Values {
-	args := url.Values{}
-	args.Add("oauth_version", "1.0")
-	args.Add("oauth_signature_method", "HMAC-SHA1")
-	args.Add("oauth_nonce", generateNonce())
-	args.Add("oauth_timestamp", fmt.Sprintf("%d", time.Now().Unix()))
-
-	return args
 }
 
 func GetRequestToken(client *FlickrClient) (*RequestToken, error) {
