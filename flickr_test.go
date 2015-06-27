@@ -34,6 +34,13 @@ func TestSign(t *testing.T) {
 	Expect(t, signed, expected)
 }
 
+func TestClearArgs(t *testing.T) {
+	c := GetTestClient()
+	c.SetDefaultArgs()
+	c.ClearArgs()
+	Expect(t, len(c.Args), 0)
+}
+
 func TestGenerateNonce(t *testing.T) {
 	var nonce string
 	nonce = generateNonce()
