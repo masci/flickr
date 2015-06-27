@@ -179,22 +179,30 @@ type OAuthToken struct {
 	UserNsid         string
 	Username         string
 	Fullname         string
+	OAuthProblem     string
 }
 
 func ParseOAuthToken(response string) (*OAuthToken, error) {
-	// TODO parse flickr errors inside the body
 	val, err := url.ParseQuery(strings.TrimSpace(response))
 	if err != nil {
 		return nil, err
 	}
 
-	return &OAuthToken{
-		OAuthToken:       val.Get("oauth_token"),
-		OAuthTokenSecret: val.Get("oauth_token_secret"),
-		Fullname:         val.Get("fullname"),
-		UserNsid:         val.Get("user_nsid"),
-		Username:         val.Get("username"),
-	}, nil
+	ret := &OAuthToken{}
+
+	oauth_problem := val.Get("oauth_problem")
+	if oauth_problem != "" {
+		ret.OAuthProblem = oauth_problem
+		return ret, flickErr.NewError(30)
+	}
+
+	ret.OAuthToken = val.Get("oauth_token")
+	ret.OAuthTokenSecret = val.Get("oauth_token_secret")
+	ret.Fullname = val.Get("fullname")
+	ret.UserNsid = val.Get("user_nsid")
+	ret.Username = val.Get("username")
+
+	return ret, nil
 }
 
 func GetRequestToken(client *FlickrClient) (*RequestToken, error) {

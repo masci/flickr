@@ -125,7 +125,7 @@ func TestNewFlickrClient(t *testing.T) {
 	Expect(t, len(tok.Args), 0)
 }
 
-func TestNewOAuthToken(t *testing.T) {
+func TestParseOAuthToken(t *testing.T) {
 	response := "fullname=Jamal%20Fanaian" +
 		"&oauth_token=72157626318069415-087bfc7b5816092c" +
 		"&oauth_token_secret=a202d1f853ec69de" +
@@ -139,6 +139,25 @@ func TestNewOAuthToken(t *testing.T) {
 	Expect(t, tok.UserNsid, "21207597@N07")
 	Expect(t, tok.Username, "jamalfanaian")
 	Expect(t, tok.Fullname, "Jamal Fanaian")
+}
+
+func TestParseOAuthTokenKo(t *testing.T) {
+	response := "oauth_problem=foo"
+	tok, err := ParseOAuthToken(response)
+
+	ee, ok := err.(*flickErr.Error)
+	if !ok {
+		t.Error("err is not a flickErr.Error!")
+	}
+
+	Expect(t, ee.ErrorCode, 30)
+	Expect(t, tok.OAuthProblem, "foo")
+
+	tok, err = ParseOAuthToken("notA%%%ValidUrl")
+	if err == nil {
+		t.Error("Parsing an invalid URL string should rise an error")
+	}
+
 }
 
 func TestGetAccessToken(t *testing.T) {
