@@ -148,7 +148,7 @@ type RequestToken struct {
 	OauthTokenSecret       string
 }
 
-func NewRequestToken(response string) (*RequestToken, error) {
+func ParseRequestToken(response string) (*RequestToken, error) {
 	// TODO parse flickr errors inside the body
 	val, err := url.ParseQuery(strings.TrimSpace(response))
 	if err != nil {
@@ -208,7 +208,7 @@ func GetRequestToken(client *FlickrClient) (*RequestToken, error) {
 		return nil, err
 	}
 
-	return NewRequestToken(string(body))
+	return ParseRequestToken(string(body))
 }
 
 func GetAuthorizeUrl(client *FlickrClient, reqToken *RequestToken) (string, error) {
