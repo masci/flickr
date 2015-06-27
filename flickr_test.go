@@ -2,6 +2,7 @@ package flickr
 
 import (
 	"encoding/xml"
+	flickErr "github.com/masci/flick-rsync/flickr/error"
 	"testing"
 )
 
@@ -65,11 +66,24 @@ func TestSetDefaultArgs(t *testing.T) {
 
 func TestParseRequestToken(t *testing.T) {
 	in := "oauth_callback_confirmed=true&oauth_token=72157654304937659-8eedcda57d9d57e3&oauth_token_secret=8700d234e3fc00c6"
-	expected := RequestToken{true, "72157654304937659-8eedcda57d9d57e3", "8700d234e3fc00c6"}
+	expected := RequestToken{true, "72157654304937659-8eedcda57d9d57e3", "8700d234e3fc00c6", ""}
 
 	tok, err := ParseRequestToken(in)
 	Expect(t, nil, err)
 	Expect(t, *tok, expected)
+}
+
+func TestParseRequestTokenKo(t *testing.T) {
+	in := "oauth_problem=foo"
+	tok, err := ParseRequestToken(in)
+
+	ee, ok := err.(*flickErr.Error)
+	if !ok {
+		t.Error("err is not a flickErr.Error!")
+	}
+
+	Expect(t, ee.ErrorCode, 20)
+	Expect(t, tok.OAuthProblem, "foo")
 
 	tok, err = ParseRequestToken("notA%%%ValidUrl")
 	if err == nil {
@@ -97,7 +111,7 @@ func TestGetRequestToken(t *testing.T) {
 
 func TestGetAuthorizeUrl(t *testing.T) {
 	client := GetTestClient()
-	tok := &RequestToken{true, "token", "token_secret"}
+	tok := &RequestToken{true, "token", "token_secret", ""}
 	url, err := GetAuthorizeUrl(client, tok)
 	Expect(t, err, nil)
 	Expect(t, url, "https://www.flickr.com/services/oauth/authorize?oauth_token=token&perms=delete")
@@ -140,7 +154,7 @@ func TestGetAccessToken(t *testing.T) {
 	// use the mocked client
 	fclient.HTTPClient = client
 
-	rt := &RequestToken{true, "token", "token_secret"}
+	rt := &RequestToken{true, "token", "token_secret", ""}
 
 	_, err := GetAccessToken(fclient, rt, "fooVerifier")
 	if err != nil {

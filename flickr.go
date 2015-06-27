@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
+	flickErr "github.com/masci/flick-rsync/flickr/error"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -146,22 +147,30 @@ type RequestToken struct {
 	OauthCallbackConfirmed bool
 	OauthToken             string
 	OauthTokenSecret       string
+	OAuthProblem           string
 }
 
+// Extract a RequestToken from the response body
 func ParseRequestToken(response string) (*RequestToken, error) {
-	// TODO parse flickr errors inside the body
 	val, err := url.ParseQuery(strings.TrimSpace(response))
 	if err != nil {
 		return nil, err
 	}
 
-	confirmed, _ := strconv.ParseBool(val.Get("oauth_callback_confirmed"))
+	ret := &RequestToken{}
 
-	return &RequestToken{
-		confirmed,
-		val.Get("oauth_token"),
-		val.Get("oauth_token_secret"),
-	}, nil
+	oauth_problem := val.Get("oauth_problem")
+	if oauth_problem != "" {
+		ret.OAuthProblem = oauth_problem
+		return ret, flickErr.NewError(20)
+	}
+
+	confirmed, _ := strconv.ParseBool(val.Get("oauth_callback_confirmed"))
+	ret.OauthCallbackConfirmed = confirmed
+	ret.OauthToken = val.Get("oauth_token")
+	ret.OauthTokenSecret = val.Get("oauth_token_secret")
+
+	return ret, nil
 }
 
 type OAuthToken struct {
