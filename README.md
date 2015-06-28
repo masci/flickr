@@ -1,8 +1,8 @@
-# Flickr.go
+# flickr.go
 
 A go library to easily consume Flickr API.
 
-## API Coverage
+## API Coverage: 1/38
 
 ### OAuth Authentication
  * Get request token
