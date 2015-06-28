@@ -1,8 +1,8 @@
 package test
 
 import (
-	"github.com/masci/flick-rsync/flickr"
-	flickErr "github.com/masci/flick-rsync/flickr/error"
+	"github.com/masci/flickr.go/flickr"
+	flickErr "github.com/masci/flickr.go/flickr/error"
 	"testing"
 )
 

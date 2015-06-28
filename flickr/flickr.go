@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
-	flickErr "github.com/masci/flick-rsync/flickr/error"
+	flickErr "github.com/masci/flickr.go/flickr/error"
 	"io/ioutil"
 	"math/rand"
 	"net/http"

@@ -2,7 +2,7 @@ package flickr
 
 import (
 	"encoding/xml"
-	flickErr "github.com/masci/flick-rsync/flickr/error"
+	flickErr "github.com/masci/flickr.go/flickr/error"
 	"testing"
 )
 
