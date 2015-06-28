@@ -23,5 +23,6 @@ _testmain.go
 *.test
 flick-rsync
 *.swp
+*.swo
 coverage.out
 .DS_Store
