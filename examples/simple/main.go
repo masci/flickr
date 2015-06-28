@@ -59,8 +59,4 @@ func main() {
 	} else {
 		fmt.Println(resp.Status, resp.User)
 	}
-
-	// check oauth token validity
-	body, err := oauth.CheckToken(client, client.OAuthToken)
-	fmt.Println(*body)
 }
