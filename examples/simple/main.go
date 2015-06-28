@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/masci/flickr.go/flickr"
+	"github.com/masci/flickr.go/flickr/auth/oauth"
 	"github.com/masci/flickr.go/flickr/test"
 	"os"
 )
@@ -48,6 +49,7 @@ func main() {
 	accessTok, err := flickr.GetAccessToken(client, tok, oauthVerifier)
 	client.OAuthToken = accessTok.OAuthToken
 	client.OAuthTokenSecret = accessTok.OAuthTokenSecret
+	fmt.Println("Successfully retrieved OAuth token", client.OAuthToken)
 
 	// check everything works
 	resp, err := test.Login(client)
@@ -56,6 +58,9 @@ func main() {
 
 	} else {
 		fmt.Println(resp.Status, resp.User)
-
 	}
+
+	// check oauth token validity
+	body, err := oauth.CheckToken(client, client.OAuthToken)
+	fmt.Println(*body)
 }
