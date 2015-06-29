@@ -221,3 +221,14 @@ func TestFlickrResponse(t *testing.T) {
 	Expect(t, resp.ErrorCode(), 0)
 	Expect(t, resp.ErrorMsg(), "")
 }
+
+func TestApiSign(t *testing.T) {
+	client := NewFlickrClient("1234567890", "SECRET")
+	client.Args.Set("foo", "1")
+	client.Args.Set("bar", "2")
+	client.Args.Set("baz", "3")
+
+	client.ApiSign(client.ApiSecret)
+
+	Expect(t, client.Args.Get("api_sig"), "a626bf097044e8b6f7b9214f049f3cc7")
+}

@@ -1,7 +1,9 @@
 package flickr
 
 import (
+	"bytes"
 	"crypto/hmac"
+	"crypto/md5"
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/xml"
@@ -11,6 +13,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -74,6 +77,13 @@ func (c *FlickrClient) Sign(tokenSecret string) {
 	c.Args.Set("oauth_signature", c.getSignature(tokenSecret))
 }
 
+// Specific signing process for API calls, it's not the same as OAuth sign
+func (c *FlickrClient) ApiSign(tokenSecret string) {
+	// the "api_sig" param must not be included in the signing process
+	c.Args.Del("api_sig")
+	c.Args.Set("api_sig", c.getApiSignature(tokenSecret))
+}
+
 // Evaluate the complete URL to make requests (base url + params)
 func (c *FlickrClient) GetUrl() string {
 	return fmt.Sprintf("%s?%s", c.EndpointUrl, c.Args.Encode())
@@ -112,6 +122,29 @@ func (c *FlickrClient) getSignature(token_secret string) string {
 	ret := base64.StdEncoding.EncodeToString(mac.Sum(nil))
 
 	return ret
+}
+
+func (c *FlickrClient) getApiSignature(token_secret string) string {
+	var buf bytes.Buffer
+	buf.WriteString(token_secret)
+
+	keys := make([]string, 0, len(c.Args))
+	for k := range c.Args {
+		keys = append(keys, k)
+	}
+	// args needs to be in alphabetical order
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		arg := c.Args[k][0]
+		buf.WriteString(k)
+		buf.WriteString(arg)
+	}
+
+	base := buf.String()
+
+	data := []byte(base)
+	return fmt.Sprintf("%x", md5.Sum(data))
 }
 
 // Base type representing responses from Flickr API
