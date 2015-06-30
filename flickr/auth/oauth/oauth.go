@@ -34,18 +34,18 @@ func CheckToken(client *flickr.FlickrClient, oauthToken string) (*CheckTokenResp
 	client.Args.Set("api_key", client.ApiKey)
 	client.ApiSign(client.ApiSecret)
 
-	response := CheckTokenResponse{}
-	err := flickr.GetResponse(client, &response)
+	response := &CheckTokenResponse{}
+	err := flickr.GetResponse(client, response)
 
 	if err != nil {
 		return nil, err
 	}
 
 	if response.HasErrors() {
-		return &response, flickErr.NewError(10)
+		return response, flickErr.NewError(10)
 	}
 
-	return &response, nil
+	return response, nil
 }
 
 func getAccessToken() {
