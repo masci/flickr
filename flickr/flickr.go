@@ -121,6 +121,7 @@ func (c *FlickrClient) getSignature(token_secret string) string {
 	return ret
 }
 
+// TODO docs
 func (c *FlickrClient) getApiSignature(token_secret string) string {
 	var buf bytes.Buffer
 	buf.WriteString(token_secret)
