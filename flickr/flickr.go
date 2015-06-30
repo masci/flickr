@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -169,4 +170,25 @@ func (r *FlickrResponse) ErrorCode() int {
 // Return error message string (empty string if no errors)
 func (r *FlickrResponse) ErrorMsg() string {
 	return r.Error.Message
+}
+
+// TODO docs
+func GetResponse(client *FlickrClient, r interface{}) error {
+	res, err := client.HTTPClient.Get(client.GetUrl())
+	if err != nil {
+		return err
+	}
+
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	err = xml.Unmarshal([]byte(body), r)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
