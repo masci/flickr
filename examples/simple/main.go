@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/masci/flickr.go/flickr"
-	"github.com/masci/flickr.go/flickr/auth/oauth"
 	"github.com/masci/flickr.go/flickr/test"
 	"os"
 )
