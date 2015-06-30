@@ -4,9 +4,9 @@ import (
 	"encoding/xml"
 	"github.com/masci/flickr.go/flickr"
 	flickErr "github.com/masci/flickr.go/flickr/error"
-	"io/ioutil"
 )
 
+// TODO docs
 type CheckTokenResponse struct {
 	flickr.FlickrResponse
 	OAuth struct {
@@ -25,6 +25,7 @@ type CheckTokenResponse struct {
 	}
 }
 
+// TODO docs
 func CheckToken(client *flickr.FlickrClient, oauthToken string) (*CheckTokenResponse, error) {
 	client.EndpointUrl = flickr.API_ENDPOINT
 	client.ClearArgs()
@@ -33,19 +34,9 @@ func CheckToken(client *flickr.FlickrClient, oauthToken string) (*CheckTokenResp
 	client.Args.Set("api_key", client.ApiKey)
 	client.ApiSign(client.ApiSecret)
 
-	res, err := client.HTTPClient.Get(client.GetUrl())
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	response := CheckTokenResponse{}
-	err = xml.Unmarshal([]byte(body), &response)
+	err := flickr.GetResponse(client, &response)
+
 	if err != nil {
 		return nil, err
 	}
