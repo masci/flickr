@@ -1,7 +1,6 @@
 package error
 
-// TODO
-// here define ONLY errors from the library NOT from flickr
+// here we define ONLY errors from the library NOT from flickr
 // error from flickr have already a code and a message that are returned
 // along with the HTTP Response
 
