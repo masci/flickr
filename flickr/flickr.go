@@ -1,3 +1,4 @@
+// Flickr.go is a Go library for accessing Flickr API https://www.flickr.com/services/api
 package flickr
 
 import (
