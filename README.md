@@ -4,6 +4,7 @@ A go library to easily consume Flickr API.
 The project is currently under heavy development, so API coverage should get better soon.
 
 [![GoDoc](https://godoc.org/github.com/masci/flickr.go?status.svg)](https://godoc.org/github.com/masci/flickr.go)
+[![Build Status](https://travis-ci.org/masci/flickr.go.svg)](https://travis-ci.org/masci/flickr.go)
 
 ## API Methods
 
