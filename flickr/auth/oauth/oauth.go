@@ -6,14 +6,17 @@ import (
 	flickErr "github.com/masci/flickr.go/flickr/error"
 )
 
-// TODO docs
+// Response type representing data returned by CheckToken
 type CheckTokenResponse struct {
 	flickr.FlickrResponse
 	OAuth struct {
 		XMLName xml.Name `xml:"oauth"`
-		Token   string   `xml:"token"`
-		Perms   string   `xml:"perms"`
-		User    struct {
+		// OAuth token
+		Token string `xml:"token"`
+		// String containing permissions bonded to this token
+		Perms string `xml:"perms"`
+		// The owner of this token
+		User struct {
 			XMLName xml.Name `xml:"user"`
 			// Flickr ID
 			ID string `xml:"nsid,attr"`
@@ -25,7 +28,8 @@ type CheckTokenResponse struct {
 	}
 }
 
-// TODO docs
+// Returns the credentials attached to an OAuth authentication token.
+// This method does not require user authentication, but the request must be api-signed.
 func CheckToken(client *flickr.FlickrClient, oauthToken string) (*CheckTokenResponse, error) {
 	client.EndpointUrl = flickr.API_ENDPOINT
 	client.ClearArgs()
