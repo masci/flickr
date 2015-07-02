@@ -122,7 +122,8 @@ func (c *FlickrClient) getSignature(token_secret string) string {
 	return ret
 }
 
-// TODO docs
+// Sign API requests. This method differs from the signing process needed for
+// OAuth authenticated requests.
 func (c *FlickrClient) getApiSignature(token_secret string) string {
 	var buf bytes.Buffer
 	buf.WriteString(token_secret)
