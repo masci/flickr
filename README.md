@@ -5,6 +5,7 @@ The project is currently under heavy development, so API coverage should get bet
 
 [![GoDoc](https://godoc.org/github.com/masci/flickr.go?status.svg)](https://godoc.org/github.com/masci/flickr.go)
 [![Build Status](https://travis-ci.org/masci/flickr.go.svg)](https://travis-ci.org/masci/flickr.go)
+[![Coverage Status](https://coveralls.io/repos/masci/flickr.go/badge.svg)](https://coveralls.io/r/masci/flickr.go)
 
 ## API Methods
 
