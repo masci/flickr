@@ -7,4 +7,4 @@ before_install:
   - go get github.com/mattn/goveralls
 
 script:
-    - runtests.sh
+    - ${TRAVIS_BUILD_DIR}/runtests.sh
