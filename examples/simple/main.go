@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/masci/flickr.go/flickr"
 	"github.com/masci/flickr.go/flickr/test"
-	"os"
 )
 
 func main() {

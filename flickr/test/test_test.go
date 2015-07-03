@@ -1,9 +1,10 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/masci/flickr.go/flickr"
 	flickErr "github.com/masci/flickr.go/flickr/error"
-	"testing"
 )
 
 func TestLoginKo(t *testing.T) {

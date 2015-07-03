@@ -1,11 +1,12 @@
 package flickr
 
 import (
-	flickErr "github.com/masci/flickr.go/flickr/error"
 	"io/ioutil"
 	"net/url"
 	"strconv"
 	"strings"
+
+	flickErr "github.com/masci/flickr.go/flickr/error"
 )
 
 // Type representing a request token during the exchange process

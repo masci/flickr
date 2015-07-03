@@ -3,6 +3,7 @@ package test
 
 import (
 	"encoding/xml"
+
 	"github.com/masci/flickr.go/flickr"
 	flickErr "github.com/masci/flickr.go/flickr/error"
 )

@@ -2,8 +2,9 @@ package flickr
 
 import (
 	"encoding/xml"
-	flickErr "github.com/masci/flickr.go/flickr/error"
 	"testing"
+
+	flickErr "github.com/masci/flickr.go/flickr/error"
 )
 
 func TestGetSigningBaseString(t *testing.T) {

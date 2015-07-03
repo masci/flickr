@@ -25,4 +25,5 @@ flick-rsync
 *.swp
 *.swo
 coverage.out
+profile.cov
 .DS_Store

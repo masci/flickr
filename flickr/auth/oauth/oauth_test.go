@@ -1,9 +1,10 @@
 package oauth
 
 import (
+	"testing"
+
 	"github.com/masci/flickr.go/flickr"
 	flickErr "github.com/masci/flickr.go/flickr/error"
-	"testing"
 )
 
 func TestCheckToken(t *testing.T) {
