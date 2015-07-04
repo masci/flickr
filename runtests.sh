@@ -1,4 +1,5 @@
 #!/bin/bash
+# Code based on https://github.com/hailiang/gosweep
 
 set -e
 
