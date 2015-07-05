@@ -35,7 +35,7 @@ type EchoResponse struct {
 // A testing method which checks if the caller is logged in then returns their username.
 // This method requires authentication with 'read' permission.
 func Login(client *flickr.FlickrClient) (*LoginResponse, error) {
-	client.EndpointUrl = flickr.API_ENDPOINT // TODO move to SetDefaultArgs?
+	client.EndpointUrl = flickr.API_ENDPOINT
 	client.SetDefaultArgs()
 	client.Args.Set("method", "flickr.test.login")
 	client.Args.Set("oauth_token", client.OAuthToken)
