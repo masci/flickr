@@ -1,4 +1,4 @@
-// flickr.test API methods
+// Package implementing methods: flickr.test.*
 package test
 
 import (

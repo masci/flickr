@@ -1,3 +1,4 @@
+// Package implementing methods: flickr.auth.oauth.*
 package oauth
 
 import (
