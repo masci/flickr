@@ -1,3 +1,4 @@
+// Flickr.go error system
 package error
 
 // here we define ONLY errors from the library NOT from flickr
