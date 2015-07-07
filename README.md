@@ -201,7 +201,7 @@ The project is currently under heavy development, so API coverage should get bet
  * ~~flickr.photosets.editPhotos~~
  * ~~flickr.photosets.getContext~~
  * ~~flickr.photosets.getInfo~~
- * ~~flickr.photosets.getList~~
+ * flickr.photosets.getList
  * ~~flickr.photosets.getPhotos~~
  * ~~flickr.photosets.orderSets~~
  * ~~flickr.photosets.removePhoto~~
