@@ -2,14 +2,36 @@
 package photosets
 
 import (
-	"encoding/xml"
-
 	"github.com/masci/flickr.go/flickr"
 	flickErr "github.com/masci/flickr.go/flickr/error"
 )
 
 type PhotsetsListResponse struct {
 	flickr.FlickrResponse
+	Photosets struct {
+		Page    int `xml:"page,attr"`
+		Pages   int `xml:"pages,attr"`
+		Perpage int `xml:"perpage,attr"`
+		Total   int `xml:"total,attr"`
+		Items   []struct {
+			Id                string `xml:"id,attr"`
+			Primary           string `xml:"primary,attr"`
+			Secret            string `xml:"secret,attr"`
+			Server            string `xml:"server,attr"`
+			Farm              string `xml:"farm,attr"`
+			Photos            int    `xml:"photos,attr"`
+			Videos            int    `xml:"videos,attr"`
+			NeedsInterstitial bool   `xml:"needs_interstitial,attr"`
+			VisCanSeeSet      bool   `xml:"visibility_can_see_set,attr"`
+			CountViews        int    `xml:"count_views,attr"`
+			CountComments     int    `xml:"count_comments,attr"`
+			CanComment        bool   `xml:"can_comment,attr"`
+			DateCreate        int    `xml:"date_create,attr"`
+			DateUpdate        int    `xml:"date_update,attr"`
+			Title             string `xml:"title"`
+			Description       string `xml:"description"`
+		} `xml:"photoset"`
+	} `xml:"photosets"`
 }
 
 // Return all the photosets belonging to the caller user
