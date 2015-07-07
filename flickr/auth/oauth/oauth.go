@@ -2,8 +2,6 @@
 package oauth
 
 import (
-	"encoding/xml"
-
 	"github.com/masci/flickr.go/flickr"
 	flickErr "github.com/masci/flickr.go/flickr/error"
 )
@@ -12,22 +10,20 @@ import (
 type CheckTokenResponse struct {
 	flickr.FlickrResponse
 	OAuth struct {
-		XMLName xml.Name `xml:"oauth"`
 		// OAuth token
 		Token string `xml:"token"`
 		// String containing permissions bonded to this token
 		Perms string `xml:"perms"`
 		// The owner of this token
 		User struct {
-			XMLName xml.Name `xml:"user"`
 			// Flickr ID
 			ID string `xml:"nsid,attr"`
 			// Flickr Username
 			Username string `xml:"username,attr"`
 			// Flickr full name
 			Fullname string `xml:"fullname,attr"`
-		}
-	}
+		} `xml:"user"`
+	} `xml:"oauth"`
 }
 
 // Returns the credentials attached to an OAuth authentication token.

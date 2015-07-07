@@ -2,8 +2,6 @@
 package test
 
 import (
-	"encoding/xml"
-
 	"github.com/masci/flickr.go/flickr"
 	flickErr "github.com/masci/flickr.go/flickr/error"
 )
@@ -13,12 +11,11 @@ type LoginResponse struct {
 	flickr.FlickrResponse
 	// the user who provided authentication infos
 	User struct {
-		XMLName xml.Name `xml:"user"`
 		// Flickr ID
 		ID string `xml:"id,attr"`
 		// Flickr Username
 		Username string `xml:"username"`
-	}
+	} `xml:"user"`
 }
 
 // Response type used by Echo function

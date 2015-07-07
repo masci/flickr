@@ -154,10 +154,9 @@ type FlickrResponse struct {
 	Status string `xml:"stat,attr"`
 	// Flickr API error detail
 	Error struct {
-		XMLName xml.Name `xml:"err"`
-		Code    int      `xml:"code,attr"`
-		Message string   `xml:"msg,attr"`
-	}
+		Code    int    `xml:"code,attr"`
+		Message string `xml:"msg,attr"`
+	} `xml:"err"`
 }
 
 // Return whether a response contains errors
