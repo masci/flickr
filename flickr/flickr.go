@@ -19,6 +19,7 @@ import (
 
 const (
 	API_ENDPOINT      = "https://api.flickr.com/services/rest"
+	UPLOAD_ENDPOINT   = "https://up.flickr.com/services/upload/"
 	AUTHORIZE_URL     = "https://www.flickr.com/services/oauth/authorize"
 	REQUEST_TOKEN_URL = "https://www.flickr.com/services/oauth/request_token"
 	ACCESS_TOKEN_URL  = "https://www.flickr.com/services/oauth/access_token"
