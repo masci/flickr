@@ -3,6 +3,7 @@ package flickr
 import (
 	"bytes"
 	"encoding/xml"
+	flickErr "github.com/masci/flickr.go/flickr/error"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -57,47 +58,53 @@ type UploadResponse struct {
 }
 
 // TODO docs
-func UploadPhoto(client *FlickrClient, path string, optionalParams *UploadParams) (int, error) {
+func UploadPhoto(client *FlickrClient, path string, optionalParams *UploadParams) (*UploadResponse, error) {
 	client.EndpointUrl = UPLOAD_ENDPOINT
-	client.ClearArgs()
-	client.Args.Set("api_key", client.ApiKey)
+	client.HTTPVerb = "POST"
+	client.SetDefaultArgs()
+	client.Args.Set("oauth_token", client.OAuthToken)
+	client.Args.Set("oauth_consumer_key", client.ApiKey)
 
 	if optionalParams == nil {
 		optionalParams = NewUploadParams()
 	}
 
-	client.Args.Set("title", optionalParams.Title)
+	//client.Args.Set("title", optionalParams.Title)
 	// TODO finish filling args with optional params
 	// ...
-	client.ApiSign(client.ApiSecret)
+	client.Sign(client.OAuthTokenSecret)
 
 	file, err := os.Open(path)
 	if err != nil {
-		return -1, err
+		return nil, err
 	}
 	defer file.Close()
 
 	body, ctype, err := getUploadBody(client, file)
 	if err != nil {
-		return -1, err
+		return nil, err
 	}
 
-	res, err := client.HTTPClient.Post(client.GetUrl(), ctype, body)
+	res, err := client.HTTPClient.Post(client.EndpointUrl, ctype, body)
 	if err != nil {
-		return -1, err
+		return nil, err
 	}
 
 	defer res.Body.Close()
 	bodyResponse, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return -1, err
+		return nil, err
 	}
 
-	resp := UploadResponse{}
-	err = xml.Unmarshal([]byte(bodyResponse), resp)
+	resp := &UploadResponse{}
+	err = xml.Unmarshal(bodyResponse, resp)
 	if err != nil {
-		return -1, err
+		return nil, err
 	}
 
-	return resp.Id, nil
+	if resp.HasErrors() {
+		return resp, flickErr.NewError(10)
+	}
+
+	return resp, nil
 }
