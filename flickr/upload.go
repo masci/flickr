@@ -2,7 +2,11 @@ package flickr
 
 import (
 	"bytes"
+	"encoding/xml"
+	"io"
+	"io/ioutil"
 	"mime/multipart"
+	"os"
 	"path/filepath"
 )
 
@@ -22,7 +26,7 @@ func NewUploadParams() *UploadParams {
 }
 
 // TODO docs
-func getUploadBody(client *FlickrClient, file *File) (*bytes.Buffer, string, error) {
+func getUploadBody(client *FlickrClient, file *os.File) (*bytes.Buffer, string, error) {
 	// instance an empty request body
 	body := &bytes.Buffer{}
 	// multipart writer to fill the body
@@ -35,7 +39,7 @@ func getUploadBody(client *FlickrClient, file *File) (*bytes.Buffer, string, err
 	_, err = io.Copy(part, file)
 	// dump other params
 	for key, val := range client.Args {
-		_ = writer.WriteField(key, val)
+		_ = writer.WriteField(key, val[0])
 	}
 	err = writer.Close()
 	if err != nil {
@@ -45,6 +49,11 @@ func getUploadBody(client *FlickrClient, file *File) (*bytes.Buffer, string, err
 	contentType := writer.FormDataContentType()
 
 	return body, contentType, nil
+}
+
+type UploadResponse struct {
+	FlickrResponse
+	Id int `xml:"photoid"`
 }
 
 // TODO docs
@@ -68,8 +77,27 @@ func UploadPhoto(client *FlickrClient, path string, optionalParams *UploadParams
 	}
 	defer file.Close()
 
-	body := getUploadBody(client, file)
+	body, ctype, err := getUploadBody(client, file)
+	if err != nil {
+		return -1, err
+	}
 
-	res, err := client.HTTP.Post(client.GetUrl(), "", body)
+	res, err := client.HTTPClient.Post(client.GetUrl(), ctype, body)
+	if err != nil {
+		return -1, err
+	}
 
+	defer res.Body.Close()
+	bodyResponse, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return -1, err
+	}
+
+	resp := UploadResponse{}
+	err = xml.Unmarshal([]byte(bodyResponse), resp)
+	if err != nil {
+		return -1, err
+	}
+
+	return resp.Id, nil
 }
