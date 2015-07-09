@@ -107,7 +107,8 @@ func (c *FlickrClient) getSigningBaseString() string {
 	request_url := url.QueryEscape(c.EndpointUrl)
 	query := url.QueryEscape(c.Args.Encode())
 
-	return fmt.Sprintf("%s&%s&%s", c.HTTPVerb, request_url, query)
+	ret := fmt.Sprintf("%s&%s&%s", c.HTTPVerb, request_url, query)
+	return ret
 }
 
 // Compute the signature of a signed request
