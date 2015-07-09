@@ -10,11 +10,11 @@ import (
 
 func main() {
 	// retrieve Flickr credentials from env vars
-	apik := os.Getenv("FLICKRSYNC_API_KEY")
-	apisec := os.Getenv("FLICKRSYNC_API_SECRET")
+	apik := os.Getenv("FLICKRGO_API_KEY")
+	apisec := os.Getenv("FLICKRGO_API_SECRET")
 	// do not proceed if credentials were not provided
 	if apik == "" || apisec == "" {
-		fmt.Fprintln(os.Stderr, "Please set FLICKRSYNC_API_KEY and FLICKRSYNC_API_SECRET env vars")
+		fmt.Fprintln(os.Stderr, "Please set FLICKRGO_API_KEY and FLICKRGO_API_SECRET env vars")
 		os.Exit(1)
 	}
 
