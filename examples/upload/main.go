@@ -35,4 +35,14 @@ func main() {
 	} else {
 		fmt.Println("Photo uploaded, id:", id)
 	}
+
+	params := flickr.NewUploadParams()
+	params.Title = "A Gopher"
+	id, err = flickr.UploadPhoto(client, path, params)
+
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("Photo uploaded, id:", id)
+	}
 }
