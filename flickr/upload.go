@@ -3,28 +3,17 @@ package flickr
 import (
 	"bytes"
 	"encoding/xml"
+	"fmt"
 	flickErr "github.com/masci/flickr.go/flickr/error"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 )
-
-// TODO docs
-type UploadParams struct {
-	Title, Description, Tags     string
-	IsPublic, IsFamily, IsFriend bool
-	ContentType                  int
-	Hidden                       bool
-	SafetyLevel                  bool
-}
-
-// TODO docs
-func NewUploadParams() *UploadParams {
-	ret := &UploadParams{}
-	return ret
-}
 
 // TODO docs
 func getUploadBody(client *FlickrClient, file *os.File) (*bytes.Buffer, string, error) {
@@ -52,9 +41,75 @@ func getUploadBody(client *FlickrClient, file *os.File) (*bytes.Buffer, string, 
 	return body, contentType, nil
 }
 
+// A convenience struct wrapping all optional upload parameters
+type UploadParams struct {
+	Title, Description           string
+	Tags                         []string
+	IsPublic, IsFamily, IsFriend bool
+	ContentType                  int
+	Hidden                       int
+	SafetyLevel                  int
+}
+
+// Provide meaningful default values
+func NewUploadParams() *UploadParams {
+	ret := &UploadParams{}
+	ret.ContentType = 1 // photo
+	ret.Hidden = 2      // hidden from public searchesi
+	ret.SafetyLevel = 1 // safe
+	return ret
+}
+
+// Type representing a successful upload response from the api
 type UploadResponse struct {
 	FlickrResponse
 	Id int `xml:"photoid"`
+}
+
+// Set client query arguments based on the contents of the UploadParams struct
+// NOTICE: we need to URLencode params in this phase because Flickr expects encoded strings in the POST body
+func fillArgsWithParams(client *FlickrClient, params *UploadParams) {
+	var escape = func(in string) string {
+		escaped, err := url.Parse(in)
+		if err != nil {
+			return ""
+		}
+		return escaped.String()
+	}
+
+	if params.Title != "" {
+		client.Args.Set("title", escape(params.Title))
+	}
+
+	if params.Description != "" {
+		client.Args.Set("description", escape(params.Description))
+	}
+
+	if len(params.Tags) > 0 {
+		client.Args.Set("tags", escape(strings.Join(params.Tags, " ")))
+	}
+
+	var boolString = func(b bool) string {
+		if b {
+			return "1"
+		}
+		return "0"
+	}
+	client.Args.Set("is_public", boolString(params.IsPublic))
+	client.Args.Set("is_friend", boolString(params.IsFriend))
+	client.Args.Set("is_family", boolString(params.IsFamily))
+
+	if params.ContentType >= 1 && params.ContentType <= 3 {
+		client.Args.Set("content_type", strconv.Itoa(params.ContentType))
+	}
+
+	if params.Hidden >= 1 && params.Hidden <= 2 {
+		client.Args.Set("hidden", strconv.Itoa(params.Hidden))
+	}
+
+	if params.SafetyLevel >= 1 && params.SafetyLevel <= 3 {
+		client.Args.Set("safety_level", strconv.Itoa(params.SafetyLevel))
+	}
 }
 
 // TODO docs
@@ -65,13 +120,10 @@ func UploadPhoto(client *FlickrClient, path string, optionalParams *UploadParams
 	client.Args.Set("oauth_token", client.OAuthToken)
 	client.Args.Set("oauth_consumer_key", client.ApiKey)
 
-	if optionalParams == nil {
-		optionalParams = NewUploadParams()
+	if optionalParams != nil {
+		fillArgsWithParams(client, optionalParams)
 	}
 
-	//client.Args.Set("title", optionalParams.Title)
-	// TODO finish filling args with optional params
-	// ...
 	client.Sign(client.OAuthTokenSecret)
 
 	file, err := os.Open(path)
@@ -99,6 +151,7 @@ func UploadPhoto(client *FlickrClient, path string, optionalParams *UploadParams
 	resp := &UploadResponse{}
 	err = xml.Unmarshal(bodyResponse, resp)
 	if err != nil {
+		fmt.Println(string(bodyResponse))
 		return nil, err
 	}
 
