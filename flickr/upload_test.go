@@ -1,7 +1,14 @@
 package flickr
 
 import (
+	"bytes"
+	"io"
+	"io/ioutil"
+	"os"
+	"strings"
 	"testing"
+
+	flickErr "github.com/masci/flickr.go/flickr/error"
 )
 
 func TestNewUploadParams(t *testing.T) {
@@ -56,5 +63,56 @@ func TestFillArgsWithParams(t *testing.T) {
 
 func TestGetUploadBody(t *testing.T) {
 	client := GetTestClient()
+	photo := bytes.NewBufferString("foo")
+	body, ctype, err := getUploadBody(client, photo, "fnam")
 
+	Expect(t, err, nil)
+	Expect(t, strings.Contains(ctype, "multipart/form-data; boundary="), true)
+	Expect(t, strings.Contains(body.String(), "foo"), true)
+}
+
+func TestUploadPhoto(t *testing.T) {
+	fclient := GetTestClient()
+	server, client := FlickrMock(200, `<?xml version="1.0" encoding="utf-8" ?><rsp stat="ok"></rsp>`, "")
+	defer server.Close()
+	fclient.HTTPClient = client
+	params := NewUploadParams()
+
+	resp, err := UploadPhoto(fclient, "", params)
+	Expect(t, resp == nil, true) // comparing nil interfaces would fail
+	_, ok := err.(*os.PathError)
+	Expect(t, ok, true)
+
+	fooFile, err := ioutil.TempFile("", "flickr.go")
+	defer fooFile.Close()
+	Expect(t, err, nil)
+	resp, err = UploadPhoto(fclient, fooFile.Name(), params)
+	Expect(t, resp.HasErrors(), false)
+}
+
+func TestUploadPhotoKo(t *testing.T) {
+	fclient := GetTestClient()
+	server, client := FlickrMock(200, `<?xml version="1.0" encoding="utf-8" ?><rsp stat="fail"></rsp>`, "")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	fooFile, err := ioutil.TempFile("", "flickr.go")
+	defer fooFile.Close()
+	resp, err := UploadPhoto(fclient, fooFile.Name(), nil)
+	_, ok := err.(*flickErr.Error)
+	Expect(t, ok, true)
+	Expect(t, resp.HasErrors(), true)
+}
+
+func TestUploadPhotoPOSTKo(t *testing.T) {
+	fclient := GetTestClient()
+	server, client := FlickrMock(200, "a_non_rest_error", "")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	fooFile, err := ioutil.TempFile("", "flickr.go")
+	defer fooFile.Close()
+	resp, err := UploadPhoto(fclient, fooFile.Name(), nil)
+	Expect(t, err, io.EOF)
+	Expect(t, resp == nil, true)
 }
