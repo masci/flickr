@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// TODO docs
+// Encode the file and request parameters in a multipart body
 func getUploadBody(client *FlickrClient, file *os.File) (*bytes.Buffer, string, error) {
 	// instance an empty request body
 	body := &bytes.Buffer{}
@@ -99,7 +99,10 @@ func fillArgsWithParams(client *FlickrClient, params *UploadParams) {
 	}
 }
 
-// TODO docs
+// Perform a file upload using the Flickr API. If optionalParams is nil,
+// no parameters will be added to the request and Flickr will set User's
+// default preferences.
+// This call must be signed with write permissions
 func UploadPhoto(client *FlickrClient, path string, optionalParams *UploadParams) (*UploadResponse, error) {
 	client.EndpointUrl = UPLOAD_ENDPOINT
 	client.HTTPVerb = "POST"
