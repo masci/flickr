@@ -49,7 +49,3 @@ func CheckToken(client *flickr.FlickrClient, oauthToken string) (*CheckTokenResp
 
 	return response, nil
 }
-
-func getAccessToken() {
-
-}
