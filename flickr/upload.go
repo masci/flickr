@@ -2,11 +2,8 @@ package flickr
 
 import (
 	"bytes"
-	"encoding/xml"
-	"fmt"
 	flickErr "github.com/masci/flickr.go/flickr/error"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"os"
 	"path/filepath"
@@ -127,24 +124,10 @@ func UploadPhoto(client *FlickrClient, path string, optionalParams *UploadParams
 		return nil, err
 	}
 
-	res, err := client.HTTPClient.Post(client.EndpointUrl, ctype, body)
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-	bodyResponse, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	resp := &UploadResponse{}
-	err = xml.Unmarshal(bodyResponse, resp)
-	if err != nil {
-		// In case of OAuth errors (signature, parameters, etc) Flicker does not
-		// return a REST response but raw text.
-		// TODO log instead of printing
-		fmt.Println(string(bodyResponse))
+	err = DoPost(client, body, ctype, resp)
+
+	if err == nil {
 		return nil, err
 	}
 

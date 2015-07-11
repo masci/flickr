@@ -178,6 +178,26 @@ func (r *FlickrResponse) ErrorMsg() string {
 	return r.Error.Message
 }
 
+// TODO
+func parseResponse(res *http.Response, r interface{}) error {
+	defer res.Body.Close()
+	responseBody, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+
+	err = xml.Unmarshal(responseBody, r)
+	if err != nil {
+		// In case of OAuth errors (signature, parameters, etc) Flicker does not
+		// return a REST response but raw text.
+		// TODO log instead of printing
+		fmt.Println(string(responseBody))
+		return err
+	}
+
+	return nil
+}
+
 // Perform a GET request to the API with the configured FlickrClient passed as first
 // parameter. Results will be unmarshalled to fill in a Response struct passed as
 // second parameter.
@@ -187,16 +207,14 @@ func DoGet(client *FlickrClient, r interface{}) error {
 		return err
 	}
 
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	return parseResponse(res, r)
+}
+
+func DoPost(client *FlickrClient, body *bytes.Buffer, bodyType string, r interface{}) error {
+	res, err := client.HTTPClient.Post(client.EndpointUrl, bodyType, body)
 	if err != nil {
 		return err
 	}
 
-	err = xml.Unmarshal(body, r)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return parseResponse(res, r)
 }
