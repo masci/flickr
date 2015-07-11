@@ -193,7 +193,7 @@ func DoGet(client *FlickrClient, r interface{}) error {
 		return err
 	}
 
-	err = xml.Unmarshal([]byte(body), r)
+	err = xml.Unmarshal(body, r)
 	if err != nil {
 		return err
 	}
