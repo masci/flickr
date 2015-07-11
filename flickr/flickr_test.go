@@ -1,11 +1,19 @@
 package flickr
 
 import (
+	"bytes"
 	"encoding/xml"
+	"io"
+	"net/http"
 	"testing"
 
 	flickErr "github.com/masci/flickr.go/flickr/error"
 )
+
+type FooResponse struct {
+	FlickrResponse
+	Foo string `xml:"foo"`
+}
 
 func TestGetSigningBaseString(t *testing.T) {
 	c := GetTestClient()
@@ -183,11 +191,6 @@ func TestGetAccessToken(t *testing.T) {
 }
 
 func TestFlickrResponse(t *testing.T) {
-	type FooResponse struct {
-		FlickrResponse
-		Foo string `xml:"foo"`
-	}
-
 	failure := `<?xml version="1.0" encoding="utf-8" ?>
 <rsp stat="fail">
   <err code="99" msg="Insufficient permissions. Method requires read privileges; none granted." />
@@ -232,4 +235,53 @@ func TestApiSign(t *testing.T) {
 	client.ApiSign(client.ApiSecret)
 
 	Expect(t, client.Args.Get("api_sig"), "a626bf097044e8b6f7b9214f049f3cc7")
+}
+
+func TestParseResponse(t *testing.T) {
+	bodyStr := `<?xml version="1.0" encoding="utf-8" ?>
+<rsp stat="ok">
+  <user id="23148015@N00">
+    <username>Massimiliano Pippi</username>
+  </user>
+  <foo>Foo!</foo>
+</rsp>`
+
+	flickrResp := &FooResponse{}
+	response := &http.Response{}
+	response.Body = NewFakeBody(bodyStr)
+
+	err := parseResponse(response, flickrResp)
+
+	Expect(t, err, nil)
+	Expect(t, flickrResp.Foo, "Foo!")
+
+	response = &http.Response{}
+	response.Body = NewFakeBody("a_non_rest_format_error")
+
+	err = parseResponse(response, flickrResp)
+	Expect(t, err, io.EOF)
+}
+
+func TestDoGet(t *testing.T) {
+	bodyStr := `<?xml version="1.0" encoding="utf-8" ?><rsp stat="ok"></rsp>`
+
+	fclient := GetTestClient()
+	server, client := FlickrMock(200, bodyStr, "")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	err := DoGet(fclient, &FooResponse{})
+	Expect(t, err, nil)
+}
+
+func TestDoPost(t *testing.T) {
+	bodyStr := `<?xml version="1.0" encoding="utf-8" ?><rsp stat="ok"></rsp>`
+
+	fclient := GetTestClient()
+	server, client := FlickrMock(200, bodyStr, "")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	err := DoPost(fclient, bytes.NewBufferString("foo"), "", &FooResponse{})
+	Expect(t, err, nil)
 }
