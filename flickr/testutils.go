@@ -1,6 +1,7 @@
 package flickr
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -65,4 +66,22 @@ func FlickrMock(code int, body string, contentType string) (*httptest.Server, *h
 	u, _ := url.Parse(server.URL)
 
 	return server, &http.Client{Transport: RewriteTransport{URL: u}}
+}
+
+// A ReaderCloser to fake http.Response Body field
+type FakeBody struct {
+	content *bytes.Buffer
+}
+
+func (f *FakeBody) Read(p []byte) (n int, err error) {
+	return f.content.Read(p)
+}
+
+func (f FakeBody) Close() error {
+	// noop
+	return nil
+}
+
+func NewFakeBody(s string) *FakeBody {
+	return &FakeBody{content: bytes.NewBufferString(s)}
 }
