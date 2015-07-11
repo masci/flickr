@@ -40,7 +40,7 @@ func Login(client *flickr.FlickrClient) (*LoginResponse, error) {
 	client.Sign(client.OAuthTokenSecret)
 
 	loginResponse := &LoginResponse{}
-	err := flickr.GetResponse(client, loginResponse)
+	err := flickr.DoGet(client, loginResponse)
 
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func Null(client *flickr.FlickrClient) (*flickr.FlickrResponse, error) {
 	client.Sign(client.OAuthTokenSecret)
 
 	response := &flickr.FlickrResponse{}
-	err := flickr.GetResponse(client, response)
+	err := flickr.DoGet(client, response)
 
 	if err != nil {
 		return nil, err
@@ -85,7 +85,7 @@ func Echo(client *flickr.FlickrClient) (*EchoResponse, error) {
 	client.Args.Set("oauth_consumer_key", client.ApiKey)
 
 	response := &EchoResponse{}
-	err := flickr.GetResponse(client, response)
+	err := flickr.DoGet(client, response)
 
 	if err != nil {
 		return nil, err

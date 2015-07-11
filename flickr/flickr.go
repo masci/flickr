@@ -181,7 +181,7 @@ func (r *FlickrResponse) ErrorMsg() string {
 // Perform a GET request to the API with the configured FlickrClient passed as first
 // parameter. Results will be unmarshalled to fill in a Response struct passed as
 // second parameter.
-func GetResponse(client *FlickrClient, r interface{}) error {
+func DoGet(client *FlickrClient, r interface{}) error {
 	res, err := client.HTTPClient.Get(client.GetUrl())
 	if err != nil {
 		return err

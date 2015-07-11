@@ -141,6 +141,9 @@ func UploadPhoto(client *FlickrClient, path string, optionalParams *UploadParams
 	resp := &UploadResponse{}
 	err = xml.Unmarshal(bodyResponse, resp)
 	if err != nil {
+		// In case of OAuth errors (signature, parameters, etc) Flicker does not
+		// return a REST response but raw text.
+		// TODO log instead of printing
 		fmt.Println(string(bodyResponse))
 		return nil, err
 	}

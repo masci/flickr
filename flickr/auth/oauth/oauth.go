@@ -37,7 +37,7 @@ func CheckToken(client *flickr.FlickrClient, oauthToken string) (*CheckTokenResp
 	client.ApiSign(client.ApiSecret)
 
 	response := &CheckTokenResponse{}
-	err := flickr.GetResponse(client, response)
+	err := flickr.DoGet(client, response)
 
 	if err != nil {
 		return nil, err

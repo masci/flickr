@@ -45,7 +45,7 @@ func GetOwnList(client *flickr.FlickrClient) (*PhotsetsListResponse, error) {
 	client.ApiSign(client.ApiSecret)
 
 	response := &PhotsetsListResponse{}
-	err := flickr.GetResponse(client, response)
+	err := flickr.DoGet(client, response)
 
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func GetList(client *flickr.FlickrClient, userId string) (*PhotsetsListResponse,
 	client.Args.Set("user_id", userId)
 
 	response := &PhotsetsListResponse{}
-	err := flickr.GetResponse(client, response)
+	err := flickr.DoGet(client, response)
 
 	if err != nil {
 		return nil, err
