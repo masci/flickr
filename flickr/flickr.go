@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"net/url"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -105,7 +106,8 @@ func (c *FlickrClient) SetDefaultArgs() {
 // Get the base string to compose the signature
 func (c *FlickrClient) getSigningBaseString() string {
 	request_url := url.QueryEscape(c.EndpointUrl)
-	query := url.QueryEscape(c.Args.Encode())
+	flickr_encoded := strings.Replace(c.Args.Encode(), "+", "%20", -1)
+	query := url.QueryEscape(flickr_encoded)
 
 	ret := fmt.Sprintf("%s&%s&%s", c.HTTPVerb, request_url, query)
 	return ret
