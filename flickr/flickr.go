@@ -165,7 +165,7 @@ type FlickrResponse struct {
 
 // Return whether a response contains errors
 func (r *FlickrResponse) HasErrors() bool {
-	return r.Status == "fail"
+	return r.Status != "ok"
 }
 
 // Return the error code (0 if no errors)
