@@ -130,7 +130,7 @@ func UploadPhoto(client *FlickrClient, path string, optionalParams *UploadParams
 	resp := &UploadResponse{}
 	err = DoPost(client, body, ctype, resp)
 
-	if err == nil {
+	if err != nil {
 		return nil, err
 	}
 
