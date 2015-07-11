@@ -8,7 +8,6 @@ import (
 	"io"
 	"io/ioutil"
 	"mime/multipart"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -67,26 +66,17 @@ type UploadResponse struct {
 }
 
 // Set client query arguments based on the contents of the UploadParams struct
-// NOTICE: we need to URLencode params in this phase because Flickr expects encoded strings in the POST body
 func fillArgsWithParams(client *FlickrClient, params *UploadParams) {
-	var escape = func(in string) string {
-		escaped, err := url.Parse(in)
-		if err != nil {
-			return ""
-		}
-		return escaped.String()
-	}
-
 	if params.Title != "" {
-		client.Args.Set("title", escape(params.Title))
+		client.Args.Set("title", params.Title)
 	}
 
 	if params.Description != "" {
-		client.Args.Set("description", escape(params.Description))
+		client.Args.Set("description", params.Description)
 	}
 
 	if len(params.Tags) > 0 {
-		client.Args.Set("tags", escape(strings.Join(params.Tags, " ")))
+		client.Args.Set("tags", strings.Join(params.Tags, " "))
 	}
 
 	var boolString = func(b bool) string {
