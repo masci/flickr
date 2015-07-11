@@ -178,7 +178,8 @@ func (r *FlickrResponse) ErrorMsg() string {
 	return r.Error.Message
 }
 
-// TODO
+// Given an http.Response retrieved from Flickr, unmarshal results
+// into a FlickrResponse struct.
 func parseResponse(res *http.Response, r interface{}) error {
 	defer res.Body.Close()
 	responseBody, err := ioutil.ReadAll(res.Body)
@@ -198,8 +199,8 @@ func parseResponse(res *http.Response, r interface{}) error {
 	return nil
 }
 
-// Perform a GET request to the API with the configured FlickrClient passed as first
-// parameter. Results will be unmarshalled to fill in a Response struct passed as
+// Perform a GET request to the Flickr API with the configured FlickrClient passed as first
+// parameter. Results will be unmarshalled to fill in a FlickrResponse struct passed as
 // second parameter.
 func DoGet(client *FlickrClient, r interface{}) error {
 	res, err := client.HTTPClient.Get(client.GetUrl())
@@ -210,6 +211,9 @@ func DoGet(client *FlickrClient, r interface{}) error {
 	return parseResponse(res, r)
 }
 
+// Perform a POST request to the Flickr API with the configured FlickrClient, the
+// request body and the body content type. Results will be unmarshalled in a FlickrResponse
+// struct.
 func DoPost(client *FlickrClient, body *bytes.Buffer, bodyType string, r interface{}) error {
 	res, err := client.HTTPClient.Post(client.EndpointUrl, bodyType, body)
 	if err != nil {
