@@ -28,17 +28,11 @@ func main() {
 	client.OAuthTokenSecret = tokenSecret
 
 	path, _ := filepath.Abs("examples/upload/gopher.jpg")
-	id, err := flickr.UploadPhoto(client, path, nil)
-
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("Photo uploaded, id:", id)
-	}
 
 	params := flickr.NewUploadParams()
 	params.Title = "A Gopher"
-	id, err = flickr.UploadPhoto(client, path, params)
+
+	id, err := flickr.UploadPhoto(client, path, params)
 
 	if err != nil {
 		fmt.Println(err)
