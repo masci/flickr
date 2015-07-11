@@ -12,17 +12,17 @@ import (
 )
 
 // Encode the file and request parameters in a multipart body
-func getUploadBody(client *FlickrClient, file *os.File) (*bytes.Buffer, string, error) {
+func getUploadBody(client *FlickrClient, photo io.Reader, fileName string) (*bytes.Buffer, string, error) {
 	// instance an empty request body
 	body := &bytes.Buffer{}
 	// multipart writer to fill the body
 	writer := multipart.NewWriter(body)
 	// dump the file in the "photo" field
-	part, err := writer.CreateFormFile("photo", filepath.Base(file.Name()))
+	part, err := writer.CreateFormFile("photo", filepath.Base(fileName))
 	if err != nil {
 		return nil, "", err
 	}
-	_, err = io.Copy(part, file)
+	_, err = io.Copy(part, photo)
 	// dump other params
 	for key, val := range client.Args {
 		_ = writer.WriteField(key, val[0])
@@ -122,7 +122,7 @@ func UploadPhoto(client *FlickrClient, path string, optionalParams *UploadParams
 	}
 	defer file.Close()
 
-	body, ctype, err := getUploadBody(client, file)
+	body, ctype, err := getUploadBody(client, file, file.Name())
 	if err != nil {
 		return nil, err
 	}

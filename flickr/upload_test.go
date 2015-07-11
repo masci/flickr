@@ -52,5 +52,9 @@ func TestFillArgsWithParams(t *testing.T) {
 	Expect(t, client.Args.Get("content_type"), "")
 	Expect(t, client.Args.Get("hidden"), "")
 	Expect(t, client.Args.Get("safety_level"), "")
+}
+
+func TestGetUploadBody(t *testing.T) {
+	client := GetTestClient()
 
 }
