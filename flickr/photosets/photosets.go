@@ -3,11 +3,10 @@ package photosets
 
 import (
 	"github.com/masci/flickr.go/flickr"
-	flickErr "github.com/masci/flickr.go/flickr/error"
 )
 
-type PhotsetsListResponse struct {
-	flickr.FlickrResponse
+type PhotosetsListResponse struct {
+	flickr.BasicResponse
 	Photosets struct {
 		Page    int `xml:"page,attr"`
 		Pages   int `xml:"pages,attr"`
@@ -35,8 +34,8 @@ type PhotsetsListResponse struct {
 }
 
 // Return all the photosets belonging to the caller user
-// This call must be signed with full permissions to get both public and private sets
-func GetOwnList(client *flickr.FlickrClient) (*PhotsetsListResponse, error) {
+// This call must be signed to get both public and private sets
+func GetOwnList(client *flickr.FlickrClient) (*PhotosetsListResponse, error) {
 	client.EndpointUrl = flickr.API_ENDPOINT
 	client.ClearArgs()
 	client.Args.Set("method", "flickr.photosets.getList")
@@ -44,39 +43,36 @@ func GetOwnList(client *flickr.FlickrClient) (*PhotsetsListResponse, error) {
 
 	client.ApiSign(client.ApiSecret)
 
-	response := &PhotsetsListResponse{}
+	response := &PhotosetsListResponse{}
 	err := flickr.DoGet(client, response)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if response.HasErrors() {
-		return response, flickErr.NewError(10)
-	}
-
-	return response, nil
+	return response, err
 }
 
 // Return the public sets belonging to the user with userId
 // This method does not require authentication.
-func GetList(client *flickr.FlickrClient, userId string) (*PhotsetsListResponse, error) {
+func GetList(client *flickr.FlickrClient, userId string) (*PhotosetsListResponse, error) {
 	client.EndpointUrl = flickr.API_ENDPOINT
 	client.ClearArgs()
 	client.Args.Set("method", "flickr.photosets.getList")
 	client.Args.Set("api_key", client.ApiKey)
 	client.Args.Set("user_id", userId)
 
-	response := &PhotsetsListResponse{}
+	response := &PhotosetsListResponse{}
 	err := flickr.DoGet(client, response)
+	return response, err
+}
 
-	if err != nil {
-		return nil, err
-	}
+// TODO docs
+// This method requires authentication with 'write' permission.
+func AddPhoto(client *flickr.FlickrClient, photosetId, photoId int) (*flickr.BasicResponse, error) {
+	client.EndpointUrl = flickr.API_ENDPOINT
+	client.ClearArgs()
+	client.Args.Set("method", "flickr.photosets.getList")
+	client.Args.Set("api_key", client.ApiKey)
 
-	if response.HasErrors() {
-		return response, flickErr.NewError(10)
-	}
+	client.ApiSign(client.ApiSecret)
 
-	return response, nil
+	response := &flickr.BasicResponse{}
+	err := flickr.DoPost(client, response)
+	return response, err
 }

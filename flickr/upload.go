@@ -2,7 +2,6 @@ package flickr
 
 import (
 	"bytes"
-	flickErr "github.com/masci/flickr.go/flickr/error"
 	"io"
 	"mime/multipart"
 	"os"
@@ -129,14 +128,5 @@ func UploadPhoto(client *FlickrClient, path string, optionalParams *UploadParams
 
 	resp := &UploadResponse{}
 	err = DoPostBody(client, body, ctype, resp)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.HasErrors() {
-		return resp, flickErr.NewError(10)
-	}
-
-	return resp, nil
+	return resp, err
 }

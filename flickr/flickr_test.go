@@ -3,7 +3,6 @@ package flickr
 import (
 	"bytes"
 	"encoding/xml"
-	"io"
 	"net/http"
 	"testing"
 
@@ -259,7 +258,9 @@ func TestParseResponse(t *testing.T) {
 	response.Body = NewFakeBody("a_non_rest_format_error")
 
 	err = parseApiResponse(response, flickrResp)
-	Expect(t, err, io.EOF)
+	ferr, ok := err.(*flickErr.Error)
+	Expect(t, ok, true)
+	Expect(t, ferr.ErrorCode, 10)
 
 	response = &http.Response{}
 	response.Body = NewFakeBody(`<?xml version="1.0" encoding="utf-8" ?><rsp stat="fail"></rsp>`)

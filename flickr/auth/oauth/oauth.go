@@ -3,7 +3,6 @@ package oauth
 
 import (
 	"github.com/masci/flickr.go/flickr"
-	flickErr "github.com/masci/flickr.go/flickr/error"
 )
 
 // Response type representing data returned by CheckToken
@@ -38,14 +37,5 @@ func CheckToken(client *flickr.FlickrClient, oauthToken string) (*CheckTokenResp
 
 	response := &CheckTokenResponse{}
 	err := flickr.DoGet(client, response)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if response.HasErrors() {
-		return response, flickErr.NewError(10)
-	}
-
-	return response, nil
+	return response, err
 }

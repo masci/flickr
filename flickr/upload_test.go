@@ -2,7 +2,6 @@ package flickr
 
 import (
 	"bytes"
-	"io"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -102,17 +101,4 @@ func TestUploadPhotoKo(t *testing.T) {
 	_, ok := err.(*flickErr.Error)
 	Expect(t, ok, true)
 	Expect(t, resp.HasErrors(), true)
-}
-
-func TestUploadPhotoPOSTKo(t *testing.T) {
-	fclient := GetTestClient()
-	server, client := FlickrMock(200, "a_non_rest_error", "")
-	defer server.Close()
-	fclient.HTTPClient = client
-
-	fooFile, err := ioutil.TempFile("", "flickr.go")
-	defer fooFile.Close()
-	resp, err := UploadPhoto(fclient, fooFile.Name(), nil)
-	Expect(t, err, io.EOF)
-	Expect(t, resp == nil, true)
 }

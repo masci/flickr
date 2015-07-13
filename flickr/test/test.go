@@ -3,7 +3,6 @@ package test
 
 import (
 	"github.com/masci/flickr.go/flickr"
-	flickErr "github.com/masci/flickr.go/flickr/error"
 )
 
 // Response type used by Login function
@@ -41,16 +40,7 @@ func Login(client *flickr.FlickrClient) (*LoginResponse, error) {
 
 	loginResponse := &LoginResponse{}
 	err := flickr.DoGet(client, loginResponse)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if loginResponse.HasErrors() {
-		return loginResponse, flickErr.NewError(10)
-	}
-
-	return loginResponse, nil
+	return loginResponse, err
 }
 
 // Noop method
@@ -65,16 +55,7 @@ func Null(client *flickr.FlickrClient) (*flickr.BasicResponse, error) {
 
 	response := &flickr.BasicResponse{}
 	err := flickr.DoGet(client, response)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if response.HasErrors() {
-		return response, flickErr.NewError(10)
-	}
-
-	return response, nil
+	return response, err
 }
 
 // A testing method which echo's all parameters back in the response.
@@ -86,14 +67,5 @@ func Echo(client *flickr.FlickrClient) (*EchoResponse, error) {
 
 	response := &EchoResponse{}
 	err := flickr.DoGet(client, response)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if response.HasErrors() {
-		return response, flickErr.NewError(10)
-	}
-
-	return response, nil
+	return response, err
 }
