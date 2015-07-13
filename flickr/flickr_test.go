@@ -324,5 +324,4 @@ func TestDoPost(t *testing.T) {
 	fclient.Args.Set("fooArg", "foo way")
 
 	DoPost(fclient, &FooResponse{})
-
 }

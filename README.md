@@ -19,9 +19,9 @@ The project is currently under heavy development, so API coverage should get bet
 ### auth.oauth
  * flickr.auth.oauth.checkToken
 
-### photos (in progress, 0/26)
+### photos (in progress, 1/26)
  * ~~flickr.photos.addTags~~
- * ~~flickr.photos.delete~~
+ * flickr.photos.delete
  * ~~flickr.photos.getAllContexts~~
  * ~~flickr.photos.getContactsPhotos~~
  * ~~flickr.photos.getContactsPublicPhotos~~
