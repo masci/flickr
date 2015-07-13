@@ -29,6 +29,7 @@ func GetTestClient() *FlickrClient {
 
 	return &FlickrClient{
 		EndpointUrl: "http://www.flickr.com/services/oauth/request_token",
+		HTTPClient:  &http.Client{},
 		HTTPVerb:    "GET",
 		Args:        args,
 		ApiSecret:   "1a3c208e172d3edc",
