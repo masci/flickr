@@ -1,0 +1,5 @@
+package photos
+
+import (
+	"testing"
+)
