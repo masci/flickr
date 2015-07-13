@@ -11,7 +11,7 @@ import (
 )
 
 type FooResponse struct {
-	FlickrResponse
+	BasicResponse
 	Foo string `xml:"foo"`
 }
 
@@ -250,7 +250,7 @@ func TestParseResponse(t *testing.T) {
 	response := &http.Response{}
 	response.Body = NewFakeBody(bodyStr)
 
-	err := parseResponse(response, flickrResp)
+	err := parseApiResponse(response, flickrResp)
 
 	Expect(t, err, nil)
 	Expect(t, flickrResp.Foo, "Foo!")
@@ -258,8 +258,15 @@ func TestParseResponse(t *testing.T) {
 	response = &http.Response{}
 	response.Body = NewFakeBody("a_non_rest_format_error")
 
-	err = parseResponse(response, flickrResp)
+	err = parseApiResponse(response, flickrResp)
 	Expect(t, err, io.EOF)
+
+	response = &http.Response{}
+	response.Body = NewFakeBody(`<?xml version="1.0" encoding="utf-8" ?><rsp stat="fail"></rsp>`)
+	err = parseApiResponse(response, flickrResp)
+	//ferr, ok := err.(*flickErr.Error)
+	//Expect(t, ok, true)
+	//Expect(t, ferr.ErrorCode, 10)
 }
 
 func TestDoGet(t *testing.T) {
@@ -274,7 +281,7 @@ func TestDoGet(t *testing.T) {
 	Expect(t, err, nil)
 }
 
-func TestDoPost(t *testing.T) {
+func TestDoPostBody(t *testing.T) {
 	bodyStr := `<?xml version="1.0" encoding="utf-8" ?><rsp stat="ok"></rsp>`
 
 	fclient := GetTestClient()
@@ -282,6 +289,6 @@ func TestDoPost(t *testing.T) {
 	defer server.Close()
 	fclient.HTTPClient = client
 
-	err := DoPost(fclient, bytes.NewBufferString("foo"), "", &FooResponse{})
+	err := DoPostBody(fclient, bytes.NewBufferString("foo"), "", &FooResponse{})
 	Expect(t, err, nil)
 }

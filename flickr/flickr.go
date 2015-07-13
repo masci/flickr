@@ -180,7 +180,7 @@ func (r *FlickrResponse) ErrorMsg() string {
 
 // Given an http.Response retrieved from Flickr, unmarshal results
 // into a FlickrResponse struct.
-func parseResponse(res *http.Response, r interface{}) error {
+func parseApiResponse(res *http.Response, r interface{}) error {
 	defer res.Body.Close()
 	responseBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -208,17 +208,37 @@ func DoGet(client *FlickrClient, r interface{}) error {
 		return err
 	}
 
-	return parseResponse(res, r)
+	return parseApiResponse(res, r)
 }
 
 // Perform a POST request to the Flickr API with the configured FlickrClient, the
 // request body and the body content type. Results will be unmarshalled in a FlickrResponse
 // struct.
-func DoPost(client *FlickrClient, body *bytes.Buffer, bodyType string, r interface{}) error {
+func DoPostBody(client *FlickrClient, body *bytes.Buffer, bodyType string, r interface{}) error {
 	res, err := client.HTTPClient.Post(client.EndpointUrl, bodyType, body)
 	if err != nil {
 		return err
 	}
 
-	return parseResponse(res, r)
+	return parseApiResponse(res, r)
+}
+
+// TODO
+func DoPost(client *FlickrClient, r interface{}) error {
+	// instance an empty request body
+	body := &bytes.Buffer{}
+	// multipart writer to fill the body
+	writer := multipart.NewWriter(body)
+	// dump params
+	for key, val := range client.Args {
+		_ = writer.WriteField(key, val[0])
+	}
+	err := writer.Close()
+	if err != nil {
+		return err
+	}
+	// evaluate the content type and the boundary
+	contentType := writer.FormDataContentType()
+
+	return DoPostBody(client, body, contentType, r)
 }

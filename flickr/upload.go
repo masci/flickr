@@ -58,7 +58,7 @@ func NewUploadParams() *UploadParams {
 
 // Type representing a successful upload response from the api
 type UploadResponse struct {
-	FlickrResponse
+	BasicResponse
 	Id int `xml:"photoid"`
 }
 
@@ -128,7 +128,7 @@ func UploadPhoto(client *FlickrClient, path string, optionalParams *UploadParams
 	}
 
 	resp := &UploadResponse{}
-	err = DoPost(client, body, ctype, resp)
+	err = DoPostBody(client, body, ctype, resp)
 
 	if err != nil {
 		return nil, err

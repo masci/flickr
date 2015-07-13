@@ -8,7 +8,7 @@ import (
 
 // Response type used by Login function
 type LoginResponse struct {
-	flickr.FlickrResponse
+	flickr.BasicResponse
 	// the user who provided authentication infos
 	User struct {
 		// Flickr ID
@@ -20,7 +20,7 @@ type LoginResponse struct {
 
 // Response type used by Echo function
 type EchoResponse struct {
-	flickr.FlickrResponse
+	flickr.BasicResponse
 	// API method name, dotted notation
 	Method string `xml:"method"`
 	// API Key provided
@@ -55,7 +55,7 @@ func Login(client *flickr.FlickrClient) (*LoginResponse, error) {
 
 // Noop method
 // This method requires authentication with 'read' permission.
-func Null(client *flickr.FlickrClient) (*flickr.FlickrResponse, error) {
+func Null(client *flickr.FlickrClient) (*flickr.BasicResponse, error) {
 	client.EndpointUrl = flickr.API_ENDPOINT
 	client.SetDefaultArgs()
 	client.Args.Set("method", "flickr.test.null")
@@ -63,7 +63,7 @@ func Null(client *flickr.FlickrClient) (*flickr.FlickrResponse, error) {
 	client.Args.Set("oauth_consumer_key", client.ApiKey)
 	client.Sign(client.OAuthTokenSecret)
 
-	response := &flickr.FlickrResponse{}
+	response := &flickr.BasicResponse{}
 	err := flickr.DoGet(client, response)
 
 	if err != nil {

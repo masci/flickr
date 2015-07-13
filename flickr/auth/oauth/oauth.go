@@ -8,7 +8,7 @@ import (
 
 // Response type representing data returned by CheckToken
 type CheckTokenResponse struct {
-	flickr.FlickrResponse
+	flickr.BasicResponse
 	OAuth struct {
 		// OAuth token
 		Token string `xml:"token"`
