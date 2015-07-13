@@ -7,6 +7,7 @@ import (
 
 	"github.com/masci/flickr.go/flickr"
 	"github.com/masci/flickr.go/flickr/photos"
+	"github.com/masci/flickr.go/flickr/photosets"
 )
 
 func main() {
@@ -39,19 +40,31 @@ func main() {
 	params := flickr.NewUploadParams()
 	params.Title = "A Gopher"
 	resp, err := flickr.UploadPhoto(client, path, params)
-
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Failed uploading:", err, resp.ErrorMsg())
 		os.Exit(1)
 	} else {
 		fmt.Println("Photo uploaded, id:", resp.Id)
 		pause()
 	}
 
+	// create a photoset
+	respS, err := photosets.Create(client, "A Set", "", resp.Id)
+	if err != nil {
+		fmt.Println("Failed creating set:", respS.ErrorMsg())
+		os.Exit(1)
+	} else {
+		fmt.Println("Set created, id:", respS.Set.Id, "url:", respS.Set.Url)
+		pause()
+	}
+
+	// TODO assign photo to the photoset
+	// TODO remove the photo from the photoset
+
 	// delete the photo
 	respD, err := photos.Delete(client, resp.Id)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Failed deleting photo:", err)
 		fmt.Println(respD.ErrorMsg())
 		os.Exit(1)
 	} else {
