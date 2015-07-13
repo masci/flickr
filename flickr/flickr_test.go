@@ -3,7 +3,11 @@ package flickr
 import (
 	"bytes"
 	"encoding/xml"
+	"fmt"
+	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	flickErr "github.com/masci/flickr.go/flickr/error"
@@ -223,6 +227,16 @@ func TestFlickrResponse(t *testing.T) {
 	Expect(t, resp.Foo, "Foo!")
 	Expect(t, resp.ErrorCode(), 0)
 	Expect(t, resp.ErrorMsg(), "")
+
+	resp = FooResponse{}
+	resp.SetErrorStatus(true)
+	resp.SetErrorMsg("a message")
+	resp.SetErrorCode(999)
+	Expect(t, resp.HasErrors(), true)
+	Expect(t, resp.ErrorMsg(), "a message")
+	Expect(t, resp.ErrorCode(), 999)
+	resp.SetErrorStatus(false)
+	Expect(t, resp.HasErrors(), false)
 }
 
 func TestApiSign(t *testing.T) {
@@ -292,4 +306,23 @@ func TestDoPostBody(t *testing.T) {
 
 	err := DoPostBody(fclient, bytes.NewBufferString("foo"), "", &FooResponse{})
 	Expect(t, err, nil)
+}
+
+func TestDoPost(t *testing.T) {
+	var handler = func(w http.ResponseWriter, r *http.Request) {
+		body, _ := ioutil.ReadAll(r.Body)
+		fmt.Fprintln(w, "Hello, client")
+		Expect(t, strings.Contains(string(body), `Content-Disposition: form-data; name="fooArg"`), true)
+		Expect(t, strings.Contains(string(body), "foo way"), true)
+	}
+
+	ts := httptest.NewServer(http.HandlerFunc(handler))
+	defer ts.Close()
+
+	fclient := GetTestClient()
+	fclient.EndpointUrl = ts.URL
+	fclient.Args.Set("fooArg", "foo way")
+
+	DoPost(fclient, &FooResponse{})
+
 }
