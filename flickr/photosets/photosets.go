@@ -42,14 +42,13 @@ type PhotosetResponse struct {
 }
 
 // Return all the photosets belonging to the caller user
-// This call must be signed to get both public and private sets
+// This call must be authenticated to get both public and private sets
 func GetOwnList(client *flickr.FlickrClient) (*PhotosetsListResponse, error) {
 	client.EndpointUrl = flickr.API_ENDPOINT
 	client.ClearArgs()
 	client.Args.Set("method", "flickr.photosets.getList")
-	client.Args.Set("api_key", client.ApiKey)
 
-	client.ApiSign(client.ApiSecret)
+	client.ApiSign()
 
 	response := &PhotosetsListResponse{}
 	err := flickr.DoGet(client, response)
@@ -77,13 +76,10 @@ func AddPhoto(client *flickr.FlickrClient, photosetId, photoId string) (*flickr.
 	client.HTTPVerb = "POST"
 	client.SetDefaultArgs()
 	client.Args.Set("method", "flickr.photosets.addPhoto")
-	client.Args.Set("oauth_token", client.OAuthToken)
-	client.Args.Set("oauth_consumer_key", client.ApiKey)
-	client.Args.Set("api_key", client.ApiKey)
 	client.Args.Set("photoset_id", photosetId)
 	client.Args.Set("photo_id", photoId)
 
-	client.Sign(client.OAuthTokenSecret)
+	client.OAuthSign()
 
 	response := &flickr.BasicResponse{}
 	err := flickr.DoPost(client, response)
@@ -97,14 +93,11 @@ func Create(client *flickr.FlickrClient, title, description, primaryPhotoId stri
 	client.HTTPVerb = "POST"
 	client.SetDefaultArgs()
 	client.Args.Set("method", "flickr.photosets.create")
-	client.Args.Set("oauth_token", client.OAuthToken)
-	client.Args.Set("oauth_consumer_key", client.ApiKey)
-	client.Args.Set("api_key", client.ApiKey)
 	client.Args.Set("title", title)
 	client.Args.Set("description", description)
 	client.Args.Set("primary_photo_id", primaryPhotoId)
 
-	client.Sign(client.OAuthTokenSecret)
+	client.OAuthSign()
 
 	response := &PhotosetResponse{}
 	err := flickr.DoPost(client, response)
@@ -118,12 +111,9 @@ func Delete(client *flickr.FlickrClient, photosetId string) (*flickr.BasicRespon
 	client.HTTPVerb = "POST"
 	client.SetDefaultArgs()
 	client.Args.Set("method", "flickr.photosets.delete")
-	client.Args.Set("oauth_token", client.OAuthToken)
-	client.Args.Set("oauth_consumer_key", client.ApiKey)
-	client.Args.Set("api_key", client.ApiKey)
 	client.Args.Set("photoset_id", photosetId)
 
-	client.Sign(client.OAuthTokenSecret)
+	client.OAuthSign()
 
 	response := &flickr.BasicResponse{}
 	err := flickr.DoPost(client, response)
@@ -137,13 +127,10 @@ func RemovePhoto(client *flickr.FlickrClient, photosetId, photoId string) (*flic
 	client.HTTPVerb = "POST"
 	client.SetDefaultArgs()
 	client.Args.Set("method", "flickr.photosets.removePhoto")
-	client.Args.Set("oauth_token", client.OAuthToken)
-	client.Args.Set("oauth_consumer_key", client.ApiKey)
-	client.Args.Set("api_key", client.ApiKey)
 	client.Args.Set("photoset_id", photosetId)
 	client.Args.Set("photo_id", photoId)
 
-	client.Sign(client.OAuthTokenSecret)
+	client.OAuthSign()
 
 	response := &flickr.BasicResponse{}
 	err := flickr.DoPost(client, response)

@@ -34,9 +34,7 @@ func Login(client *flickr.FlickrClient) (*LoginResponse, error) {
 	client.EndpointUrl = flickr.API_ENDPOINT
 	client.SetDefaultArgs()
 	client.Args.Set("method", "flickr.test.login")
-	client.Args.Set("oauth_token", client.OAuthToken)
-	client.Args.Set("oauth_consumer_key", client.ApiKey)
-	client.Sign(client.OAuthTokenSecret)
+	client.OAuthSign()
 
 	loginResponse := &LoginResponse{}
 	err := flickr.DoGet(client, loginResponse)
@@ -49,9 +47,7 @@ func Null(client *flickr.FlickrClient) (*flickr.BasicResponse, error) {
 	client.EndpointUrl = flickr.API_ENDPOINT
 	client.SetDefaultArgs()
 	client.Args.Set("method", "flickr.test.null")
-	client.Args.Set("oauth_token", client.OAuthToken)
-	client.Args.Set("oauth_consumer_key", client.ApiKey)
-	client.Sign(client.OAuthTokenSecret)
+	client.OAuthSign()
 
 	response := &flickr.BasicResponse{}
 	err := flickr.DoGet(client, response)
