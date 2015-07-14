@@ -58,7 +58,7 @@ func NewUploadParams() *UploadParams {
 // Type representing a successful upload response from the api
 type UploadResponse struct {
 	BasicResponse
-	Id int `xml:"photoid"`
+	Id string `xml:"photoid"`
 }
 
 // Set client query arguments based on the contents of the UploadParams struct
