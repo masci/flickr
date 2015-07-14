@@ -47,10 +47,10 @@ The project is currently under heavy development, so API coverage should get bet
  * ~~flickr.photos.setSafetyLevel~~
  * ~~flickr.photos.setTags~~
 
-### photosets (in progress, 1/14)
- * ~~flickr.photosets.addPhoto~~
- * ~~flickr.photosets.create~~
- * ~~flickr.photosets.delete~~
+### photosets (in progress, 4/14)
+ * flickr.photosets.addPhoto
+ * flickr.photosets.create
+ * flickr.photosets.delete
  * ~~flickr.photosets.editMeta~~
  * ~~flickr.photosets.editPhotos~~
  * ~~flickr.photosets.getContext~~
