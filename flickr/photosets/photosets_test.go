@@ -117,3 +117,22 @@ func TestGetListKo(t *testing.T) {
 	flickr.Expect(t, resp.HasErrors(), true)
 	flickr.Expect(t, resp.ErrorCode(), 1)
 }
+
+func TestAddPhoto(t *testing.T) {
+	fclient := flickr.GetTestClient()
+	server, client := flickr.FlickrMock(200, `<rsp stat="ok"></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	_, err := AddPhoto(fclient, "123456", "123")
+	flickr.Expect(t, err, nil)
+
+	server, client = flickr.FlickrMock(200, `<rsp stat="fail"></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	resp, err := AddPhoto(fclient, "123456", "123")
+	_, ok := err.(*flickErr.Error)
+	flickr.Expect(t, ok, true)
+	flickr.Expect(t, resp.HasErrors(), true)
+}
