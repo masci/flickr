@@ -8,7 +8,7 @@ import (
 	flickErr "github.com/masci/flickr.go/flickr/error"
 )
 
-// TODO docs
+// Interface for Flickr request objects
 type FlickrResponse interface {
 	HasErrors() bool
 	ErrorCode() int
@@ -45,7 +45,7 @@ func (r *BasicResponse) ErrorMsg() string {
 	return r.Error.Message
 }
 
-// TODO
+// Set error status explicitly
 func (r *BasicResponse) SetErrorStatus(hasErrors bool) {
 	if hasErrors {
 		r.Status = "fail"
@@ -54,12 +54,12 @@ func (r *BasicResponse) SetErrorStatus(hasErrors bool) {
 	}
 }
 
-// TODO
+// Set error code explicitly
 func (r *BasicResponse) SetErrorCode(code int) {
 	r.Error.Code = code
 }
 
-// TODO
+// Set error message explicitly
 func (r *BasicResponse) SetErrorMsg(msg string) {
 	r.Error.Message = msg
 }

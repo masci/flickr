@@ -4,7 +4,7 @@ import (
 	"github.com/masci/flickr.go/flickr"
 )
 
-// TODO
+// Delete a photo from Flickr
 // This method requires authentication with 'delete' permission.
 func Delete(client *flickr.FlickrClient, id string) (*flickr.BasicResponse, error) {
 	client.EndpointUrl = flickr.API_ENDPOINT

@@ -38,7 +38,8 @@ func DoPostBody(client *FlickrClient, body *bytes.Buffer, bodyType string, r Fli
 	return parseApiResponse(res, r)
 }
 
-// TODO docs
+// Perform a POST request to the Flickr API with the configured FlickrClient,
+// dumping client Args into the request Body.
 func DoPost(client *FlickrClient, r FlickrResponse) error {
 	// instance an empty request body
 	body := &bytes.Buffer{}
