@@ -2,8 +2,6 @@
 package photosets
 
 import (
-	"fmt"
-
 	"github.com/masci/flickr.go/flickr"
 )
 
@@ -72,24 +70,29 @@ func GetList(client *flickr.FlickrClient, userId string) (*PhotosetsListResponse
 	return response, err
 }
 
-// TODO docs
+// Add a photo to a photoset
 // This method requires authentication with 'write' permission.
-func AddPhoto(client *flickr.FlickrClient, photosetId, photoId int) (*flickr.BasicResponse, error) {
+func AddPhoto(client *flickr.FlickrClient, photosetId, photoId string) (*flickr.BasicResponse, error) {
 	client.EndpointUrl = flickr.API_ENDPOINT
-	client.ClearArgs()
-	client.Args.Set("method", "flickr.photosets.getList")
+	client.HTTPVerb = "POST"
+	client.SetDefaultArgs()
+	client.Args.Set("method", "flickr.photosets.addPhoto")
+	client.Args.Set("oauth_token", client.OAuthToken)
+	client.Args.Set("oauth_consumer_key", client.ApiKey)
 	client.Args.Set("api_key", client.ApiKey)
+	client.Args.Set("photoset_id", photosetId)
+	client.Args.Set("photo_id", photoId)
 
-	client.ApiSign(client.ApiSecret)
+	client.Sign(client.OAuthTokenSecret)
 
 	response := &flickr.BasicResponse{}
 	err := flickr.DoPost(client, response)
 	return response, err
 }
 
-// TODO docs
+// Create a photoset specifying its primary photo
 // This method requires authentication with 'write' permission.
-func Create(client *flickr.FlickrClient, title, description string, primaryPhotoId int) (*PhotosetResponse, error) {
+func Create(client *flickr.FlickrClient, title, description, primaryPhotoId string) (*PhotosetResponse, error) {
 	client.EndpointUrl = flickr.API_ENDPOINT
 	client.HTTPVerb = "POST"
 	client.SetDefaultArgs()
@@ -99,11 +102,50 @@ func Create(client *flickr.FlickrClient, title, description string, primaryPhoto
 	client.Args.Set("api_key", client.ApiKey)
 	client.Args.Set("title", title)
 	client.Args.Set("description", description)
-	client.Args.Set("primary_photo_id", fmt.Sprintf("%d", primaryPhotoId))
+	client.Args.Set("primary_photo_id", primaryPhotoId)
 
 	client.Sign(client.OAuthTokenSecret)
 
 	response := &PhotosetResponse{}
+	err := flickr.DoPost(client, response)
+	return response, err
+}
+
+// Delete a photoset
+// This method requires authentication with 'write' permission.
+func Delete(client *flickr.FlickrClient, photosetId string) (*flickr.BasicResponse, error) {
+	client.EndpointUrl = flickr.API_ENDPOINT
+	client.HTTPVerb = "POST"
+	client.SetDefaultArgs()
+	client.Args.Set("method", "flickr.photosets.delete")
+	client.Args.Set("oauth_token", client.OAuthToken)
+	client.Args.Set("oauth_consumer_key", client.ApiKey)
+	client.Args.Set("api_key", client.ApiKey)
+	client.Args.Set("photoset_id", photosetId)
+
+	client.Sign(client.OAuthTokenSecret)
+
+	response := &flickr.BasicResponse{}
+	err := flickr.DoPost(client, response)
+	return response, err
+}
+
+// Remove a photo from a photoset
+// This method requires authentication with 'write' permission.
+func RemovePhoto(client *flickr.FlickrClient, photosetId, photoId string) (*flickr.BasicResponse, error) {
+	client.EndpointUrl = flickr.API_ENDPOINT
+	client.HTTPVerb = "POST"
+	client.SetDefaultArgs()
+	client.Args.Set("method", "flickr.photosets.removePhoto")
+	client.Args.Set("oauth_token", client.OAuthToken)
+	client.Args.Set("oauth_consumer_key", client.ApiKey)
+	client.Args.Set("api_key", client.ApiKey)
+	client.Args.Set("photoset_id", photosetId)
+	client.Args.Set("photo_id", photoId)
+
+	client.Sign(client.OAuthTokenSecret)
+
+	response := &flickr.BasicResponse{}
 	err := flickr.DoPost(client, response)
 	return response, err
 }
