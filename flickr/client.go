@@ -66,11 +66,23 @@ func (c *FlickrClient) Sign(tokenSecret string) {
 	c.Args.Set("oauth_signature", c.getSignature(tokenSecret))
 }
 
-// Specific signing process for API calls, it's not the same as OAuth sign
-func (c *FlickrClient) ApiSign(tokenSecret string) {
+// Sign the request with a default set of OAuth parameters, needed to authorize
+// users for certain writing/destructive operations.
+func (c *FlickrClient) OAuthSign() {
+	c.Args.Set("oauth_token", c.OAuthToken)
+	c.Args.Set("oauth_consumer_key", c.ApiKey)
+	c.Args.Set("api_key", c.ApiKey)
+
+	c.Sign(c.OAuthTokenSecret)
+}
+
+// Specific signing process for API calls: not the same as OAuth sign, used
+// for requests that don't need user authorizations.
+func (c *FlickrClient) ApiSign() {
+	c.Args.Set("api_key", c.ApiKey)
 	// the "api_sig" param must not be included in the signing process
 	c.Args.Del("api_sig")
-	c.Args.Set("api_sig", c.getApiSignature(tokenSecret))
+	c.Args.Set("api_sig", c.getApiSignature(c.ApiSecret))
 }
 
 // Evaluate the complete URL to make requests (base url + params)

@@ -76,7 +76,7 @@ func TestApiSign(t *testing.T) {
 	client.Args.Set("bar", "2")
 	client.Args.Set("baz", "3")
 
-	client.ApiSign(client.ApiSecret)
+	client.ApiSign()
 
-	Expect(t, client.Args.Get("api_sig"), "a626bf097044e8b6f7b9214f049f3cc7")
+	Expect(t, client.Args.Get("api_sig"), "0a55ae496d1db08f39deb5d894ae3849")
 }
