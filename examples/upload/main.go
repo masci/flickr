@@ -48,7 +48,7 @@ func main() {
 		pause()
 	}
 
-	// create a photoset
+	// create a photoset using above photo as primary
 	respS, err := photosets.Create(client, "A Set", "", resp.Id)
 	if err != nil {
 		fmt.Println("Failed creating set:", respS.ErrorMsg())
@@ -58,8 +58,46 @@ func main() {
 		pause()
 	}
 
-	// TODO assign photo to the photoset
-	// TODO remove the photo from the photoset
+	// upload another photo using default params
+	path, _ = filepath.Abs("examples/upload/gophers.jpg")
+	resp, err = flickr.UploadPhoto(client, path, nil)
+	if err != nil {
+		fmt.Println("Failed uploading:", err, resp.ErrorMsg())
+		os.Exit(1)
+	} else {
+		fmt.Println("Photo uploaded, id:", resp.Id)
+		pause()
+	}
+
+	// assign above photo to the photoset
+	respAdd, err := photosets.AddPhoto(client, respS.Set.Id, resp.Id)
+	if err != nil {
+		fmt.Println("Failed adding photo to the set:", err, respAdd.ErrorMsg())
+		os.Exit(1)
+	} else {
+		fmt.Println("Added photo", resp.Id, "to set", respS.Set.Id)
+		pause()
+	}
+
+	// remove the photo from the photoset
+	respRemP, err := photosets.RemovePhoto(client, respS.Set.Id, resp.Id)
+	if err != nil {
+		fmt.Println("Failed removing photo from the set:", err, respRemP.ErrorMsg())
+		os.Exit(1)
+	} else {
+		fmt.Println("Removed photo", resp.Id, "from set", respS.Set.Id)
+		pause()
+	}
+
+	// delete the photoset
+	respDelPs, err := photosets.Delete(client, respS.Set.Id)
+	if err != nil {
+		fmt.Println("Failed removing set:", respDelPs.ErrorMsg())
+		os.Exit(1)
+	} else {
+		fmt.Println("Successfully removed set")
+		pause()
+	}
 
 	// delete the photo
 	respD, err := photos.Delete(client, resp.Id)
