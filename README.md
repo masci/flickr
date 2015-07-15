@@ -75,7 +75,7 @@ client.OAuthTokenSecret = accessTok.OAuthTokenSecret
 ### Api coverage
 
 Only a small part of the Flickr Api is implemented as Go functions: even if it's quite
-simple to code the mapping, I only did it for methods I actually need in my projects
+simple to write the code for the mapping, I only did it for methods I actually need in my projects
 (contributions well accepted). Anyway, if you need to call a Flickr Api method that wasn't
 already mapped, you can do it manually:
 
@@ -85,7 +85,7 @@ import "github.com/masci/flickr.go/flickr"
 
 client := flickr.NewFlickrClient("your_apikey", "your_apisecret")
 client.Args.Set("method", "flickr.cameras.getBrandModels")
-client.Args.Set("brand", "brand")
+client.Args.Set("brand", "nikon")
 
 response := &flickr.BasicResponse{}
     err := flickr.DoGet(client, response)
@@ -93,6 +93,8 @@ if err == nil {
     fmt.Println("Api response:", response.Extra)
 }
 ```
+
+Checkout the `example` folder and the docs pages for more details.
 
 ## API Methods
 
