@@ -3,11 +3,13 @@ package flickr
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"path"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -85,4 +87,24 @@ func (f FakeBody) Close() error {
 
 func NewFakeBody(s string) *FakeBody {
 	return &FakeBody{content: bytes.NewBufferString(s)}
+}
+
+// TODO
+func AssertParamsInBody(t *testing.T, client *FlickrClient, params []string) {
+	var handler = func(w http.ResponseWriter, r *http.Request) {
+		body, _ := ioutil.ReadAll(r.Body)
+		bodystr := string(body)
+		fmt.Fprintln(w, "Hello, client")
+		for _, p := range params {
+			needle := fmt.Sprintf(`Content-Disposition: form-data; name="%s"`, p)
+			fmt.Println(needle)
+			Expect(t, strings.Contains(bodystr, needle), true)
+		}
+	}
+
+	ts := httptest.NewServer(http.HandlerFunc(handler))
+	defer ts.Close()
+
+	client.EndpointUrl = ts.URL
+	DoPost(client, &BasicResponse{})
 }
