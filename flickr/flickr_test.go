@@ -2,11 +2,6 @@ package flickr
 
 import (
 	"bytes"
-	"fmt"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"strings"
 	"testing"
 )
 
@@ -35,19 +30,9 @@ func TestDoPostBody(t *testing.T) {
 }
 
 func TestDoPost(t *testing.T) {
-	var handler = func(w http.ResponseWriter, r *http.Request) {
-		body, _ := ioutil.ReadAll(r.Body)
-		fmt.Fprintln(w, "Hello, client")
-		Expect(t, strings.Contains(string(body), `Content-Disposition: form-data; name="fooArg"`), true)
-		Expect(t, strings.Contains(string(body), "foo way"), true)
-	}
-
-	ts := httptest.NewServer(http.HandlerFunc(handler))
-	defer ts.Close()
-
 	fclient := GetTestClient()
-	fclient.EndpointUrl = ts.URL
 	fclient.Args.Set("fooArg", "foo way")
 
-	DoPost(fclient, &FooResponse{})
+	params := []string{"fooArg"}
+	AssertParamsInBody(t, fclient, params)
 }

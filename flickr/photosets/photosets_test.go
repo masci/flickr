@@ -135,4 +135,73 @@ func TestAddPhoto(t *testing.T) {
 	_, ok := err.(*flickErr.Error)
 	flickr.Expect(t, ok, true)
 	flickr.Expect(t, resp.HasErrors(), true)
+
+	params := []string{"photset_id", "photo_id"}
+	flickr.AssertParamsInBody(t, fclient, params)
+}
+
+func TestCreate(t *testing.T) {
+	fclient := flickr.GetTestClient()
+	server, client := flickr.FlickrMock(200, `<rsp stat="ok"></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	_, err := Create(fclient, "title", "desc", "123456")
+	flickr.Expect(t, err, nil)
+
+	server, client = flickr.FlickrMock(200, `<rsp stat="fail"></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	resp, err := Create(fclient, "title", "desc", "123456")
+	_, ok := err.(*flickErr.Error)
+	flickr.Expect(t, ok, true)
+	flickr.Expect(t, resp.HasErrors(), true)
+
+	params := []string{"title", "description", "primary_photo_id"}
+	flickr.AssertParamsInBody(t, fclient, params)
+}
+
+func TestDelete(t *testing.T) {
+	fclient := flickr.GetTestClient()
+	server, client := flickr.FlickrMock(200, `<rsp stat="ok"></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	_, err := Delete(fclient, "123456")
+	flickr.Expect(t, err, nil)
+
+	server, client = flickr.FlickrMock(200, `<rsp stat="fail"></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	resp, err := Delete(fclient, "123456")
+	_, ok := err.(*flickErr.Error)
+	flickr.Expect(t, ok, true)
+	flickr.Expect(t, resp.HasErrors(), true)
+
+	params := []string{"photoset_id"}
+	flickr.AssertParamsInBody(t, fclient, params)
+}
+
+func TestRemovePhoto(t *testing.T) {
+	fclient := flickr.GetTestClient()
+	server, client := flickr.FlickrMock(200, `<rsp stat="ok"></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	_, err := RemovePhoto(fclient, "123456", "123456")
+	flickr.Expect(t, err, nil)
+
+	server, client = flickr.FlickrMock(200, `<rsp stat="fail"></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	resp, err := RemovePhoto(fclient, "123456", "123456")
+	_, ok := err.(*flickErr.Error)
+	flickr.Expect(t, ok, true)
+	flickr.Expect(t, resp.HasErrors(), true)
+
+	params := []string{"photoset_id", "photo_id"}
+	flickr.AssertParamsInBody(t, fclient, params)
 }
