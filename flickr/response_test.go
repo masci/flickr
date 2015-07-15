@@ -92,3 +92,27 @@ func TestParseResponse(t *testing.T) {
 	//Expect(t, ok, true)
 	//Expect(t, ferr.ErrorCode, 10)
 }
+
+func TestExtra(t *testing.T) {
+	bodyStr := `<?xml version="1.0" encoding="utf-8" ?>
+<rsp stat="ok">
+  <user id="23148015@N00">
+    <username>Massimiliano Pippi</username>
+  </user>
+  <foo>Foo!</foo>
+  <brands>
+    <brand id="canon">Canon</brand>
+    <brand id="nikon">Nikon</brand>
+    <brand id="apple">Apple</brand>
+  </brands>
+</rsp>`
+
+	flickrResp := &BasicResponse{}
+	response := &http.Response{}
+	response.Body = NewFakeBody(bodyStr)
+
+	err := parseApiResponse(response, flickrResp)
+
+	Expect(t, err, nil)
+	Expect(t, flickrResp.Extra != "", true)
+}

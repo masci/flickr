@@ -28,6 +28,7 @@ type BasicResponse struct {
 		Code    int    `xml:"code,attr"`
 		Message string `xml:"msg,attr"`
 	} `xml:"err"`
+	Extra string `xml:",innerxml"`
 }
 
 // Return whether a response contains errors
