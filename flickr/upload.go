@@ -105,15 +105,13 @@ func fillArgsWithParams(client *FlickrClient, params *UploadParams) {
 func UploadPhoto(client *FlickrClient, path string, optionalParams *UploadParams) (*UploadResponse, error) {
 	client.EndpointUrl = UPLOAD_ENDPOINT
 	client.HTTPVerb = "POST"
-	client.SetDefaultArgs()
-	client.Args.Set("oauth_token", client.OAuthToken)
-	client.Args.Set("oauth_consumer_key", client.ApiKey)
+	client.SetOAuthDefaults()
 
 	if optionalParams != nil {
 		fillArgsWithParams(client, optionalParams)
 	}
 
-	client.Sign(client.OAuthTokenSecret)
+	client.OAuthSign()
 
 	file, err := os.Open(path)
 	if err != nil {

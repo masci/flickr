@@ -35,7 +35,7 @@ func TestSign(t *testing.T) {
 
 func TestClearArgs(t *testing.T) {
 	c := GetTestClient()
-	c.SetDefaultArgs()
+	c.SetOAuthDefaults()
 	c.ClearArgs()
 	Expect(t, len(c.Args), 0)
 }
@@ -48,7 +48,7 @@ func TestGenerateNonce(t *testing.T) {
 
 func TestSetDefaultArgs(t *testing.T) {
 	c := GetTestClient()
-	c.SetDefaultArgs()
+	c.SetOAuthDefaults()
 	check := func(key string) {
 		val := c.Args.Get(key)
 		if val == "" {
@@ -79,4 +79,13 @@ func TestApiSign(t *testing.T) {
 	client.ApiSign()
 
 	Expect(t, client.Args.Get("api_sig"), "0a55ae496d1db08f39deb5d894ae3849")
+}
+
+func TestInit(t *testing.T) {
+	client := GetTestClient()
+	client.Args.Set("foo", "bar")
+	client.EndpointUrl = ""
+	client.Init()
+	Expect(t, len(client.Args), 0)
+	Expect(t, client.EndpointUrl != "", true)
 }

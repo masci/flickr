@@ -9,7 +9,7 @@ import (
 func Delete(client *flickr.FlickrClient, id string) (*flickr.BasicResponse, error) {
 	client.EndpointUrl = flickr.API_ENDPOINT
 	client.HTTPVerb = "POST"
-	client.SetDefaultArgs()
+	client.SetOAuthDefaults()
 	client.Args.Set("method", "flickr.photos.delete")
 	client.Args.Set("photo_id", id)
 	client.OAuthSign()

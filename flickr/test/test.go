@@ -31,8 +31,8 @@ type EchoResponse struct {
 // A testing method which checks if the caller is logged in then returns their username.
 // This method requires authentication with 'read' permission.
 func Login(client *flickr.FlickrClient) (*LoginResponse, error) {
-	client.EndpointUrl = flickr.API_ENDPOINT
-	client.SetDefaultArgs()
+	client.Init()
+	client.SetOAuthDefaults()
 	client.Args.Set("method", "flickr.test.login")
 	client.OAuthSign()
 
@@ -44,8 +44,8 @@ func Login(client *flickr.FlickrClient) (*LoginResponse, error) {
 // Noop method
 // This method requires authentication with 'read' permission.
 func Null(client *flickr.FlickrClient) (*flickr.BasicResponse, error) {
-	client.EndpointUrl = flickr.API_ENDPOINT
-	client.SetDefaultArgs()
+	client.Init()
+	client.SetOAuthDefaults()
 	client.Args.Set("method", "flickr.test.null")
 	client.OAuthSign()
 

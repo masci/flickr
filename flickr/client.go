@@ -66,9 +66,18 @@ func (c *FlickrClient) Sign(tokenSecret string) {
 	c.Args.Set("oauth_signature", c.getSignature(tokenSecret))
 }
 
+// Set the mandatory params for an OAuth request
+func (c *FlickrClient) SetOAuthDefaults() {
+	c.Args.Add("oauth_version", "1.0")
+	c.Args.Add("oauth_signature_method", "HMAC-SHA1")
+	c.Args.Add("oauth_nonce", generateNonce())
+	c.Args.Add("oauth_timestamp", fmt.Sprintf("%d", time.Now().Unix()))
+}
+
 // Sign the request with a default set of OAuth parameters, needed to authorize
 // users for certain writing/destructive operations.
 func (c *FlickrClient) OAuthSign() {
+	c.SetOAuthDefaults()
 	c.Args.Set("oauth_token", c.OAuthToken)
 	c.Args.Set("oauth_consumer_key", c.ApiKey)
 	c.Args.Set("api_key", c.ApiKey)
@@ -95,13 +104,10 @@ func (c *FlickrClient) ClearArgs() {
 	c.Args = url.Values{}
 }
 
-// Set a default set of args needed for signing a request
-func (c *FlickrClient) SetDefaultArgs() {
-	c.Args = url.Values{}
-	c.Args.Add("oauth_version", "1.0")
-	c.Args.Add("oauth_signature_method", "HMAC-SHA1")
-	c.Args.Add("oauth_nonce", generateNonce())
-	c.Args.Add("oauth_timestamp", fmt.Sprintf("%d", time.Now().Unix()))
+// Reset Args and set the default endpoint
+func (c *FlickrClient) Init() {
+	c.ClearArgs()
+	c.EndpointUrl = API_ENDPOINT
 }
 
 // Get the base string to compose the signature
