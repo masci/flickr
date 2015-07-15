@@ -67,7 +67,7 @@ url, _ := flickr.GetAuthorizeUrl(client, requestTok)
 // back with the confirmation token
 
 // finally, get the access token, setup the client and start making requests
-accessTok, err := flickr.GetAccessToken(client, requestTok, "oauth_verifier_code")
+accessTok, err := flickr.GetAccessToken(client, requestTok, "oauth_confirmation_code")
 client.OAuthToken = accessTok.OAuthToken
 client.OAuthTokenSecret = accessTok.OAuthTokenSecret
 ```
