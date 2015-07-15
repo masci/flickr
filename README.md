@@ -7,14 +7,102 @@ The project is currently under heavy development, so API coverage should get bet
 [![Build Status](https://travis-ci.org/masci/flickr.go.svg)](https://travis-ci.org/masci/flickr.go)
 [![Coverage Status](https://coveralls.io/repos/masci/flickr.go/badge.svg)](https://coveralls.io/r/masci/flickr.go)
 
+## Usage
 
-## Extra-API Methods
+Flickr.go tries to expose a Go Api matching Flickr REST Api, so that you don't need
+to build HTTP requests and parse HTTP response manually. For example, the Flickr
+method `flickr.photosets.create` is implemented with the `Create` function in the `flickr/photosets`
+package:
+
+```go
+import "fmt"
+import "github.com/masci/flickr.go/flickr/photosets"
+
+// create an API client with credentials
+client := flickr.NewFlickrClient("your_apikey", "your_apisecret")
+client.OAuthToken = "your_token"
+client.OAuthTokenSecret = "your_tokenSecret"
+
+response, _ := photosets.Create(client, "My Set", "Description", "primary_photo_id")
+fmt.Println("New photoset created:", response.Photoset.Id)
+```
+
+Flickr.go responses implement `flickr.FlickrResponse` interface. Responses contains error 
+and error messages (if any) produced by Flickr or the specific data returned by the api call. 
+Different methods may return different kind of responses.
+
+### Upload a photo
+
+There are a number of functions that don't map any actual Flickr Api method
+(see below for the detailed list). For example, to upload a photo, you call the 
+`UploadPhoto` function in the `flickr` package:
+
+```go
+import "github.com/masci/flickr.go/flickr"
+
+
+// upload the image file with default (nil) options
+resp, err := flickr.UploadPhoto(client, "/path/to/image", nil)
+```
+
+### Retrieve OAuth credentials
+
+Several api calls must be authenticated and authorized: flickr.go only supports 
+OAuth since the original token-based method has been deprecated by Flickr. This
+is an example describing the OAuth worflow from a command line application:
+
+```go
+import "github.com/masci/flickr.go/flickr"
+
+client := flickr.NewFlickrClient("your_apikey", "your_apisecret")
+
+// first, get a request token
+requestTok, _ := flickr.GetRequestToken(client)
+
+// build the authorizatin URL
+url, _ := flickr.GetAuthorizeUrl(client, requestTok)
+
+// ask user to hit the authorization url with
+// their browser, authorize this application and coming
+// back with the confirmation token
+
+// finally, get the access token, setup the client and start making requests
+accessTok, err := flickr.GetAccessToken(client, requestTok, "oauth_verifier_code")
+client.OAuthToken = accessTok.OAuthToken
+client.OAuthTokenSecret = accessTok.OAuthTokenSecret
+```
+
+### Api coverage
+
+Only a small part of the Flickr Api is implemented as Go functions: even if it's quite
+simple to code the mapping, I only did it for methods I actually need in my projects
+(contributions well accepted). Anyway, if you need to call a Flickr Api method that wasn't
+already mapped, you can do it manually:
+
+```go
+import "fmt"
+import "github.com/masci/flickr.go/flickr"
+
+client := flickr.NewFlickrClient("your_apikey", "your_apisecret")
+client.Args.Set("method", "flickr.cameras.getBrandModels")
+client.Args.Set("brand", "brand")
+
+response := &flickr.BasicResponse{}
+    err := flickr.DoGet(client, response)
+if err == nil {
+    fmt.Println("Api response:", response.Extra)
+}
+```
+
+## API Methods
+
+### Extra-API Methods
+These are methods that are not actually part of the Flickr API
+
  * Get OAuth request token
  * Get OAuth authorize URL
  * Get OAuth access token
  * Upload photo
-
-## API Methods
 
 ### auth.oauth
  * flickr.auth.oauth.checkToken
