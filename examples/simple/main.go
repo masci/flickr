@@ -31,7 +31,7 @@ func main() {
 	}
 
 	// build the authorizatin URL
-	url, _ := flickr.GetAuthorizeUrl(client, tok)
+	url, err := flickr.GetAuthorizeUrl(client, tok)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(3)
