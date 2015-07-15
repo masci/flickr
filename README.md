@@ -27,7 +27,7 @@ response, _ := photosets.Create(client, "My Set", "Description", "primary_photo_
 fmt.Println("New photoset created:", response.Photoset.Id)
 ```
 
-Flickr.go responses implement `flickr.FlickrResponse` interface. Responses contains error 
+Flickr.go responses implement `flickr.FlickrResponse` interface. A response contains error codes 
 and error messages (if any) produced by Flickr or the specific data returned by the api call. 
 Different methods may return different kind of responses.
 
