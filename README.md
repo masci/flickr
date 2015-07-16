@@ -9,7 +9,7 @@ The project is currently under heavy development, so it hasn't a version number 
 
 ## Usage
 
-Flickr.go tries to expose a Go Api matching Flickr REST Api, so that you don't need
+Flickr.go aims to expose a Go Api matching Flickr REST Api, so that you don't need
 to build HTTP requests and parse HTTP response manually. For example, the Flickr
 method `flickr.photosets.create` is implemented with the `Create` function in the `flickr/photosets`
 package:
@@ -45,9 +45,9 @@ import "github.com/masci/flickr.go/flickr"
 resp, err := flickr.UploadPhoto(client, "/path/to/image", nil)
 ```
 
-### Retrieve OAuth credentials
+### Authentication (or how to retrieve OAuth credentials)
 
-Several api calls must be authenticated and authorized: flickr.go only supports 
+Several api calls must be authenticated and authorized: flickr.go only supports
 OAuth since the original token-based method has been deprecated by Flickr. This
 is an example describing the OAuth worflow from a command line application:
 
