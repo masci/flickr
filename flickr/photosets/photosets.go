@@ -2,6 +2,8 @@
 package photosets
 
 import (
+	"strconv"
+
 	"github.com/masci/flickr.go/flickr"
 )
 
@@ -25,6 +27,11 @@ type Photoset struct {
 	Url               string `xml:"url,attr"`
 }
 
+type Photo struct {
+	Id    string `xml:"id,attr"`
+	Title string `xml:"title,attr"`
+}
+
 type PhotosetsListResponse struct {
 	flickr.BasicResponse
 	Photosets struct {
@@ -39,6 +46,17 @@ type PhotosetsListResponse struct {
 type PhotosetResponse struct {
 	flickr.BasicResponse
 	Set Photoset `xml:"photoset"`
+}
+
+type PhotosListResponse struct {
+	flickr.BasicResponse
+	Photoset struct {
+		Page    int     `xml:"page,attr"`
+		Pages   int     `xml:"pages,attr"`
+		Perpage int     `xml:"perpage,attr"`
+		Total   int     `xml:"total,attr"`
+		Photos  []Photo `xml:"photo"`
+	} `xml:"photoset"`
 }
 
 // Return all the photosets belonging to the caller user
@@ -132,4 +150,19 @@ func RemovePhoto(client *flickr.FlickrClient, photosetId, photoId string) (*flic
 	response := &flickr.BasicResponse{}
 	err := flickr.DoPost(client, response)
 	return response, err
+}
+
+// Get the photos in a set
+// This method does not require authentication.
+func GetPhotos(client *flickr.FlickrClient, photosetId, userID string, page int) (*PhotosListResponse, error) {
+	client.Init()
+	client.Args.Set("method", "flickr.photosets.getList")
+	client.Args.Set("photoset_id", "photosetId")
+	if userID == "" {
+		// userID = myuserid TODO
+	}
+	if page > 1 {
+		client.Args.Set("page", strconv.Itoa(page))
+	}
+	client.Args.Set("user_id", "userID")
 }
