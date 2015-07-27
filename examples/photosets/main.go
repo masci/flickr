@@ -29,7 +29,7 @@ func main() {
 	client.OAuthTokenSecret = tokenSecret
 	client.Id = nsid
 
-	response, _ := photosets.GetList(client, false, "23148015@N00")
+	response, _ := photosets.GetList(client, false, "23148015@N00", 1)
 	fmt.Println(fmt.Sprintf("%+v", *response))
 
 	//response, _ = photosets.GetPhotos(client, false, "72157632076344815", "23148015@N00", 1)
