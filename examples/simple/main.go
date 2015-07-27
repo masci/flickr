@@ -47,8 +47,6 @@ func main() {
 
 	// finally, get the access token
 	accessTok, err := flickr.GetAccessToken(client, tok, oauthVerifier)
-	client.OAuthToken = accessTok.OAuthToken
-	client.OAuthTokenSecret = accessTok.OAuthTokenSecret
 	fmt.Println("Successfully retrieved OAuth token", client.OAuthToken)
 
 	// check everything works
