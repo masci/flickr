@@ -158,11 +158,15 @@ func GetPhotos(client *flickr.FlickrClient, photosetId, userID string, page int)
 	client.Init()
 	client.Args.Set("method", "flickr.photosets.getList")
 	client.Args.Set("photoset_id", "photosetId")
+	// this argument is optional but increases query performances
 	if userID == "" {
 		// userID = myuserid TODO
 	}
+	// if not provided, flickr defaults this argument to 1
 	if page > 1 {
 		client.Args.Set("page", strconv.Itoa(page))
 	}
 	client.Args.Set("user_id", "userID")
+
+	return nil, nil
 }
