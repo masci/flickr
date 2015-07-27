@@ -205,3 +205,35 @@ func TestRemovePhoto(t *testing.T) {
 	params := []string{"photoset_id", "photo_id"}
 	flickr.AssertParamsInBody(t, fclient, params)
 }
+
+func TestGetPhotos(t *testing.T) {
+	rspOk := `<?xml version="1.0" encoding="utf-8" ?>
+	<rsp stat="ok">
+	  <photoset id="72157654991267328" primary="18497456039" owner="126545133@N08" ownername="Caleb4ever" page="1" per_page="500" perpage="500" pages="1" total="20" title="Landscape">
+		<photo id="18497456039" secret="e590ac1028" server="410" farm="1" title="Heaven sent" isprimary="1" ispublic="1" isfriend="0" isfamily="0" />
+		<photo id="17217350039" secret="4fbc01db5b" server="8751" farm="9" title="" isprimary="0" ispublic="1" isfriend="0" isfamily="0" />
+		<photo id="16492421763" secret="5a08237214" server="8794" farm="9" title="The Green Mile with deep roots" isprimary="0" ispublic="1" isfriend="0" isfamily="0" />
+	  </photoset>
+	</rsp>`
+
+	fclient := flickr.GetTestClient()
+	server, client := flickr.FlickrMock(200, rspOk, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	resp, err := GetPhotos(fclient, false, "72157654991267328", "126545133@N08", 1)
+	flickr.Expect(t, err, nil)
+	flickr.Expect(t, len(resp.Photoset.Photos), 3)
+
+	server, client = flickr.FlickrMock(200, `<rsp stat="fail"><err code="1" msg="Photoset not found" /></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	resp, err = GetPhotos(fclient, false, "72157654991267328", "126545133@N08", 3)
+	_, ok := err.(*flickErr.Error)
+	flickr.Expect(t, ok, true)
+	flickr.Expect(t, resp.HasErrors(), true)
+
+	params := []string{"photoset_id", "user_id", "page"}
+	flickr.AssertParamsInBody(t, fclient, params)
+}

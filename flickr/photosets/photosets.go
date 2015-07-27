@@ -153,20 +153,27 @@ func RemovePhoto(client *flickr.FlickrClient, photosetId, photoId string) (*flic
 }
 
 // Get the photos in a set
-// This method does not require authentication.
-func GetPhotos(client *flickr.FlickrClient, photosetId, userID string, page int) (*PhotosListResponse, error) {
+// This method requires authentication to retrieve photos from private sets
+func GetPhotos(client *flickr.FlickrClient, authenticate bool, photosetId, ownerID string, page int) (*PhotosListResponse, error) {
 	client.Init()
-	client.Args.Set("method", "flickr.photosets.getList")
-	client.Args.Set("photoset_id", "photosetId")
+	client.Args.Set("method", "flickr.photosets.getPhotos")
+	client.Args.Set("photoset_id", photosetId)
 	// this argument is optional but increases query performances
-	if userID == "" {
-		// userID = myuserid TODO
+	if ownerID != "" {
+		client.Args.Set("user_id", ownerID)
 	}
 	// if not provided, flickr defaults this argument to 1
 	if page > 1 {
 		client.Args.Set("page", strconv.Itoa(page))
 	}
-	client.Args.Set("user_id", "userID")
+	// sign the client for authentication and authorization
+	if authenticate {
+		client.OAuthSign()
+	} else {
+		client.ApiSign()
+	}
 
-	return nil, nil
+	response := &PhotosListResponse{}
+	err := flickr.DoGet(client, response)
+	return response, err
 }
