@@ -59,25 +59,25 @@ type PhotosListResponse struct {
 	} `xml:"photoset"`
 }
 
-// Return all the photosets belonging to the caller user
-// This call must be authenticated to get both public and private sets
-func GetOwnList(client *flickr.FlickrClient) (*PhotosetsListResponse, error) {
+// Return the public sets belonging to the user with userId.
+// If userId is not provided it defaults to the caller user but call needs to be authenticated.
+// This method requires authentication to retrieve private sets.
+func GetList(client *flickr.FlickrClient, authenticate bool, userId string, page int) (*PhotosetsListResponse, error) {
 	client.Init()
 	client.Args.Set("method", "flickr.photosets.getList")
-
-	client.ApiSign()
-
-	response := &PhotosetsListResponse{}
-	err := flickr.DoGet(client, response)
-	return response, err
-}
-
-// Return the public sets belonging to the user with userId
-// This method does not require authentication.
-func GetList(client *flickr.FlickrClient, userId string) (*PhotosetsListResponse, error) {
-	client.Init()
-	client.Args.Set("method", "flickr.photosets.getList")
-	client.Args.Set("user_id", userId)
+	if userId != "" {
+		client.Args.Set("user_id", userId)
+	}
+	// if not provided, flickr defaults this argument to 1
+	if page > 1 {
+		client.Args.Set("page", strconv.Itoa(page))
+	}
+	// perform authentication if requested
+	if authenticate {
+		client.OAuthSign()
+	} else {
+		client.ApiSign()
+	}
 
 	response := &PhotosetsListResponse{}
 	err := flickr.DoGet(client, response)

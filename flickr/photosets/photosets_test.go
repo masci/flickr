@@ -28,13 +28,13 @@ var (
 		</rsp>`
 )
 
-func TestGetOwnList(t *testing.T) {
+func TestGetList(t *testing.T) {
 	fclient := flickr.GetTestClient()
 	server, client := flickr.FlickrMock(200, body, "text/xml")
 	defer server.Close()
 	fclient.HTTPClient = client
 
-	resp, err := GetOwnList(fclient)
+	resp, err := GetList(fclient, true, "123456@N00", 2)
 	flickr.Expect(t, err, nil)
 	flickr.Expect(t, resp.Photosets.Page, 1)
 	flickr.Expect(t, resp.Photosets.Pages, 1)
@@ -62,46 +62,14 @@ func TestGetOwnList(t *testing.T) {
 
 	set2 := resp.Photosets.Items[1]
 	flickr.Expect(t, set2.Description, "Another cool photosets with some pics inside")
-}
 
-func TestGetOWnListKo(t *testing.T) {
-	fclient := flickr.GetTestClient()
-	server, client := flickr.FlickrMock(200, bodyKo, "text/xml")
+	params := []string{"user_id", "page"}
+	flickr.AssertParamsInBody(t, fclient, params)
+
+	server, client = flickr.FlickrMock(200, bodyKo, "text/xml")
 	defer server.Close()
 	fclient.HTTPClient = client
-	resp, err := GetOwnList(fclient)
-
-	if err == nil {
-		t.Error("Unexpected nil error")
-		t.FailNow()
-	}
-
-	ee, ok := err.(*flickErr.Error)
-	if !ok {
-		t.Error("err is not a flickErr.Error!")
-	}
-
-	flickr.Expect(t, ee.ErrorCode, 10)
-	flickr.Expect(t, resp.HasErrors(), true)
-	flickr.Expect(t, resp.ErrorCode(), 1)
-}
-
-func TestGetList(t *testing.T) {
-	fclient := flickr.GetTestClient()
-	server, client := flickr.FlickrMock(200, body, "text/xml")
-	defer server.Close()
-	fclient.HTTPClient = client
-
-	_, err := GetList(fclient, "123456@")
-	flickr.Expect(t, err, nil)
-}
-
-func TestGetListKo(t *testing.T) {
-	fclient := flickr.GetTestClient()
-	server, client := flickr.FlickrMock(200, bodyKo, "text/xml")
-	defer server.Close()
-	fclient.HTTPClient = client
-	resp, err := GetList(fclient, "123456@")
+	resp, err = GetList(fclient, false, "", 1)
 
 	if err == nil {
 		t.Error("Unexpected nil error")
