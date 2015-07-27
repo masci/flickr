@@ -137,7 +137,7 @@ These are methods that are not actually part of the Flickr API
  * ~~flickr.photos.setSafetyLevel~~
  * ~~flickr.photos.setTags~~
 
-### photosets (in progress, 4/14)
+### photosets (in progress, 5/14)
  * flickr.photosets.addPhoto
  * flickr.photosets.create
  * flickr.photosets.delete
@@ -146,7 +146,7 @@ These are methods that are not actually part of the Flickr API
  * ~~flickr.photosets.getContext~~
  * ~~flickr.photosets.getInfo~~
  * flickr.photosets.getList
- * ~~flickr.photosets.getPhotos~~
+ * flickr.photosets.getPhotos
  * ~~flickr.photosets.orderSets~~
  * ~~flickr.photosets.removePhoto~~
  * ~~flickr.photosets.removePhotos~~
