@@ -68,6 +68,7 @@ func TestNewFlickrClient(t *testing.T) {
 	Expect(t, tok.ApiSecret, "apisecret")
 	Expect(t, tok.HTTPVerb, "GET")
 	Expect(t, len(tok.Args), 0)
+	Expect(t, tok.Id, "")
 }
 
 func TestApiSign(t *testing.T) {

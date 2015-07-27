@@ -46,6 +46,8 @@ type FlickrClient struct {
 	OAuthToken string
 	// User secret token
 	OAuthTokenSecret string
+	// User flickr ID
+	Id string
 }
 
 // Create a Flickr client, apiKey and apiSecret are mandatory
