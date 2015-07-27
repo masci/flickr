@@ -113,4 +113,8 @@ func TestGetAccessToken(t *testing.T) {
 	if err != nil {
 		t.Error("Unexpected error:", err)
 	}
+
+	Expect(t, fclient.Id, "21207597@N07")
+	Expect(t, fclient.OAuthToken, "72157626318069415-087bfc7b5816092c")
+	Expect(t, fclient.OAuthTokenSecret, "a202d1f853ec69de")
 }

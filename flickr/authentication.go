@@ -142,5 +142,12 @@ func GetAccessToken(client *FlickrClient, reqToken *RequestToken, oauthVerifier 
 		return nil, err
 	}
 
-	return ParseOAuthToken(string(body))
+	accessTok, err := ParseOAuthToken(string(body))
+
+	// set client params for convenience
+	client.OAuthToken = accessTok.OAuthToken
+	client.OAuthTokenSecret = accessTok.OAuthTokenSecret
+	client.Id = accessTok.UserNsid
+
+	return accessTok, err
 }
