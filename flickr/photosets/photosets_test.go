@@ -205,3 +205,25 @@ func TestGetPhotos(t *testing.T) {
 	params := []string{"photoset_id", "user_id", "page"}
 	flickr.AssertParamsInBody(t, fclient, params)
 }
+
+func TestEditMeta(t *testing.T) {
+	fclient := flickr.GetTestClient()
+	server, client := flickr.FlickrMock(200, `<rsp stat="ok"></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	_, err := EditMeta(fclient, "72157654991267328", "name", "long description")
+	flickr.Expect(t, err, nil)
+
+	server, client = flickr.FlickrMock(200, `<rsp stat="fail"><err code="99" msg="Insufficient permissions."/></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	resp, err := EditMeta(fclient, "72157654991267328", "name", "long description")
+	_, ok := err.(*flickErr.Error)
+	flickr.Expect(t, ok, true)
+	flickr.Expect(t, resp.HasErrors(), true)
+
+	params := []string{"photoset_id", "title"}
+	flickr.AssertParamsInBody(t, fclient, params)
+}
