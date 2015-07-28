@@ -89,7 +89,6 @@ func GetList(client *flickr.FlickrClient, authenticate bool, userId string, page
 func AddPhoto(client *flickr.FlickrClient, photosetId, photoId string) (*flickr.BasicResponse, error) {
 	client.Init()
 	client.HTTPVerb = "POST"
-	client.SetOAuthDefaults()
 	client.Args.Set("method", "flickr.photosets.addPhoto")
 	client.Args.Set("photoset_id", photosetId)
 	client.Args.Set("photo_id", photoId)
@@ -106,7 +105,6 @@ func AddPhoto(client *flickr.FlickrClient, photosetId, photoId string) (*flickr.
 func Create(client *flickr.FlickrClient, title, description, primaryPhotoId string) (*PhotosetResponse, error) {
 	client.Init()
 	client.HTTPVerb = "POST"
-	client.SetOAuthDefaults()
 	client.Args.Set("method", "flickr.photosets.create")
 	client.Args.Set("title", title)
 	client.Args.Set("description", description)
@@ -124,7 +122,6 @@ func Create(client *flickr.FlickrClient, title, description, primaryPhotoId stri
 func Delete(client *flickr.FlickrClient, photosetId string) (*flickr.BasicResponse, error) {
 	client.Init()
 	client.HTTPVerb = "POST"
-	client.SetOAuthDefaults()
 	client.Args.Set("method", "flickr.photosets.delete")
 	client.Args.Set("photoset_id", photosetId)
 
@@ -140,7 +137,6 @@ func Delete(client *flickr.FlickrClient, photosetId string) (*flickr.BasicRespon
 func RemovePhoto(client *flickr.FlickrClient, photosetId, photoId string) (*flickr.BasicResponse, error) {
 	client.Init()
 	client.HTTPVerb = "POST"
-	client.SetOAuthDefaults()
 	client.Args.Set("method", "flickr.photosets.removePhoto")
 	client.Args.Set("photoset_id", photosetId)
 	client.Args.Set("photo_id", photoId)
@@ -175,5 +171,24 @@ func GetPhotos(client *flickr.FlickrClient, authenticate bool, photosetId, owner
 
 	response := &PhotosListResponse{}
 	err := flickr.DoGet(client, response)
+	return response, err
+}
+
+// Edit set name and description
+// This method requires authentication with 'write' permission.
+func EditMeta(client *flickr.FlickrClient, photosetId, title, description string) (*flickr.BasicResponse, error) {
+	client.Init()
+	client.HTTPVerb = "POST"
+	client.Args.Set("method", "flickr.photosets.editMeta")
+	client.Args.Set("photoset_id", photosetId)
+	client.Args.Set("title", title)
+	if description != "" {
+		client.Args.Set("description", description)
+	}
+
+	client.OAuthSign()
+
+	response := &flickr.BasicResponse{}
+	err := flickr.DoPost(client, response)
 	return response, err
 }

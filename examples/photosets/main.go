@@ -28,10 +28,13 @@ func main() {
 	client.OAuthToken = token
 	client.OAuthTokenSecret = tokenSecret
 	client.Id = nsid
+	/*
+		response, _ := photosets.GetList(client, false, "23148015@N00", 1)
+		fmt.Println(fmt.Sprintf("%+v", *response))
 
-	response, _ := photosets.GetList(client, false, "23148015@N00", 1)
+		response, _ := photosets.GetPhotos(client, false, "72157632076344815", "23148015@N00", 1)
+		fmt.Println(fmt.Sprintf("%+v", *response))
+	*/
+	response, _ := photosets.EditMeta(client, "72157654143356943", "bar", "Baz")
 	fmt.Println(fmt.Sprintf("%+v", *response))
-
-	//response, _ = photosets.GetPhotos(client, false, "72157632076344815", "23148015@N00", 1)
-	//fmt.Println(fmt.Sprintf("%+v", *response))
 }
