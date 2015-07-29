@@ -28,6 +28,7 @@ func main() {
 	client.OAuthToken = token
 	client.OAuthTokenSecret = tokenSecret
 	client.Id = nsid
+
 	/*
 		response, _ := photosets.GetList(client, false, "23148015@N00", 1)
 		fmt.Println(fmt.Sprintf("%+v", *response))
@@ -37,7 +38,20 @@ func main() {
 
 		response, _ := photosets.EditMeta(client, "72157654143356943", "bar", "Baz")
 		fmt.Println(fmt.Sprintf("%+v", *response))
+
+		response, _ := photosets.EditPhotos(client, "72157654143356943", "9518691684", []string{"9518691684", "19681581995"})
+		fmt.Println(fmt.Sprintf("%+v", *response))
+
+		response, _ := photosets.RemovePhotos(client, "72157654143356943", []string{"9518691684", "19681581995"})
+		fmt.Println(fmt.Sprintf("%+v", *response))
+
+		response, _ := photosets.SetPrimaryPhoto(client, "72157656097802609", "16438207896")
+		fmt.Println(fmt.Sprintf("%+v", *response))
+
+		response, _ := photosets.OrderSets(client, []string{"72157656097802609"})
+		fmt.Println(fmt.Sprintf("%+v", *response))
 	*/
-	response, _ := photosets.EditPhotos(client, "72157654143356943", "9518691684", []string{"9518691684", "19681581995"})
+
+	response, _ := photosets.GetInfo(client, true, "72157656097802609", "")
 	fmt.Println(fmt.Sprintf("%+v", *response))
 }
