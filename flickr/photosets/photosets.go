@@ -212,8 +212,27 @@ func EditPhotos(client *flickr.FlickrClient, photosetId, primaryId string, photo
 	return response, err
 }
 
-func GetInfo() {
+// Gets information about a photoset.
+// This method does not require authentication unless you want to access a private set
+func GetInfo(client *flickr.FlickrClient, authenticate bool, photosetId, ownerID string) (*PhotosetResponse, error) {
+	client.Init()
+	client.Args.Set("method", "flickr.photosets.getInfo")
+	client.Args.Set("photoset_id", photosetId)
+	// this argument is optional but increases query performances
+	if ownerID != "" {
+		client.Args.Set("user_id", ownerID)
+	}
 
+	// sign the client for authentication and authorization
+	if authenticate {
+		client.OAuthSign()
+	} else {
+		client.ApiSign()
+	}
+
+	response := &PhotosetResponse{}
+	err := flickr.DoGet(client, response)
+	return response, err
 }
 
 func OrderSets() {
