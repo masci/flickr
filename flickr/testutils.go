@@ -97,7 +97,6 @@ func AssertParamsInBody(t *testing.T, client *FlickrClient, params []string) {
 		fmt.Fprintln(w, "Hello, client")
 		for _, p := range params {
 			needle := fmt.Sprintf(`Content-Disposition: form-data; name="%s"`, p)
-			fmt.Println(needle)
 			Expect(t, strings.Contains(bodystr, needle), true)
 		}
 	}
