@@ -104,7 +104,10 @@ func TestAddPhoto(t *testing.T) {
 	flickr.Expect(t, ok, true)
 	flickr.Expect(t, resp.HasErrors(), true)
 
-	params := []string{"photset_id", "photo_id"}
+	// check params, reset Flickr client to dismiss mocked responses
+	fclient = flickr.GetTestClient()
+	AddPhoto(fclient, "123456", "123")
+	params := []string{"photoset_id", "photo_id"}
 	flickr.AssertParamsInBody(t, fclient, params)
 }
 
@@ -126,6 +129,9 @@ func TestCreate(t *testing.T) {
 	flickr.Expect(t, ok, true)
 	flickr.Expect(t, resp.HasErrors(), true)
 
+	// check params, reset Flickr client to dismiss mocked responses
+	fclient = flickr.GetTestClient()
+	Create(fclient, "title", "desc", "123456")
 	params := []string{"title", "description", "primary_photo_id"}
 	flickr.AssertParamsInBody(t, fclient, params)
 }
@@ -148,6 +154,9 @@ func TestDelete(t *testing.T) {
 	flickr.Expect(t, ok, true)
 	flickr.Expect(t, resp.HasErrors(), true)
 
+	// check params, reset Flickr client to dismiss mocked responses
+	fclient = flickr.GetTestClient()
+	Delete(fclient, "123456")
 	params := []string{"photoset_id"}
 	flickr.AssertParamsInBody(t, fclient, params)
 }
@@ -170,6 +179,9 @@ func TestRemovePhoto(t *testing.T) {
 	flickr.Expect(t, ok, true)
 	flickr.Expect(t, resp.HasErrors(), true)
 
+	// check params, reset Flickr client to dismiss mocked responses
+	fclient = flickr.GetTestClient()
+	RemovePhoto(fclient, "123456", "123456")
 	params := []string{"photoset_id", "photo_id"}
 	flickr.AssertParamsInBody(t, fclient, params)
 }
@@ -202,6 +214,9 @@ func TestGetPhotos(t *testing.T) {
 	flickr.Expect(t, ok, true)
 	flickr.Expect(t, resp.HasErrors(), true)
 
+	// check params, reset Flickr client to dismiss mocked responses
+	fclient = flickr.GetTestClient()
+	GetPhotos(fclient, false, "72157654991267328", "126545133@N08", 3)
 	params := []string{"photoset_id", "user_id", "page"}
 	flickr.AssertParamsInBody(t, fclient, params)
 }
@@ -224,7 +239,10 @@ func TestEditMeta(t *testing.T) {
 	flickr.Expect(t, ok, true)
 	flickr.Expect(t, resp.HasErrors(), true)
 
-	params := []string{"photoset_id", "title"}
+	// check params, reset Flickr client to dismiss mocked responses
+	fclient = flickr.GetTestClient()
+	EditMeta(fclient, "72157654991267328", "name", "long description")
+	params := []string{"photoset_id", "title", "description"}
 	flickr.AssertParamsInBody(t, fclient, params)
 }
 
@@ -246,7 +264,10 @@ func TestEditPhotos(t *testing.T) {
 	flickr.Expect(t, ok, true)
 	flickr.Expect(t, resp.HasErrors(), true)
 
-	params := []string{"photoset_id", "primary_photo_id", "photos_id"}
+	// check params, reset Flickr client to dismiss mocked responses
+	fclient = flickr.GetTestClient()
+	EditPhotos(fclient, "72157654991267328", "123456", []string{"123456", "23456"})
+	params := []string{"photoset_id", "primary_photo_id", "photo_ids"}
 	flickr.AssertParamsInBody(t, fclient, params)
 }
 
@@ -268,7 +289,10 @@ func TestRemovePhotos(t *testing.T) {
 	flickr.Expect(t, ok, true)
 	flickr.Expect(t, resp.HasErrors(), true)
 
-	params := []string{"photoset_id", "photos_id"}
+	// check params, reset Flickr client to dismiss mocked responses
+	fclient = flickr.GetTestClient()
+	RemovePhotos(fclient, "72157654991267328", []string{"123456", "23456"})
+	params := []string{"photoset_id", "photo_ids"}
 	flickr.AssertParamsInBody(t, fclient, params)
 }
 
@@ -290,6 +314,46 @@ func TestSetPrimaryPhoto(t *testing.T) {
 	flickr.Expect(t, ok, true)
 	flickr.Expect(t, resp.HasErrors(), true)
 
+	// check params, reset Flickr client to dismiss mocked responses
+	fclient = flickr.GetTestClient()
+	SetPrimaryPhoto(fclient, "72157654991267328", "123456")
 	params := []string{"photoset_id", "photo_id"}
+	flickr.AssertParamsInBody(t, fclient, params)
+}
+
+func TestGetInfo(t *testing.T) {
+	respBody := `<?xml version="1.0" encoding="utf-8" ?>
+		<rsp stat="ok">
+		<photoset id="72157656097802609" owner="23148015@N00" username="Massimiliano Pippi" primary="16438207896" secret="abababa" server="0000" farm="0" photos="2" count_views="0" count_comments="0" count_photos="2" count_videos="0" can_comment="1" date_create="1438183533" date_update="1438183843" coverphoto_server="0" coverphoto_farm="0">
+		<title>FooBarBaz</title>
+		<description />
+		</photoset>
+		</rsp>`
+
+	fclient := flickr.GetTestClient()
+	server, client := flickr.FlickrMock(200, respBody, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	resp, err := GetInfo(fclient, true, "72157654991267328", "")
+	flickr.Expect(t, err, nil)
+	flickr.Expect(t, resp.Set.Id, "72157656097802609")
+
+	server, client = flickr.FlickrMock(200, `<rsp stat="fail"><err code="1" msg="Photoset not found" /></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	resp, err = GetInfo(fclient, true, "72157654991267328", "")
+	_, ok := err.(*flickErr.Error)
+	flickr.Expect(t, ok, true)
+	flickr.Expect(t, resp.HasErrors(), true)
+
+	// check params, reset Flickr client to dismiss mocked responses
+	fclient = flickr.GetTestClient()
+	GetInfo(fclient, true, "72157654991267328", "")
+	params := []string{"photoset_id"}
+	flickr.AssertParamsInBody(t, fclient, params)
+	GetInfo(fclient, true, "72157654991267328", "uuid")
+	params = append(params, "user_id")
 	flickr.AssertParamsInBody(t, fclient, params)
 }
