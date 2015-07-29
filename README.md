@@ -109,46 +109,21 @@ These are methods that are not actually part of the Flickr API
 ### auth.oauth
  * flickr.auth.oauth.checkToken
 
-### photos (in progress, 1/26)
- * ~~flickr.photos.addTags~~
+### photos
  * flickr.photos.delete
- * ~~flickr.photos.getAllContexts~~
- * ~~flickr.photos.getContactsPhotos~~
- * ~~flickr.photos.getContactsPublicPhotos~~
- * ~~flickr.photos.getContext~~
- * ~~flickr.photos.getCounts~~
- * ~~flickr.photos.getExif~~
- * ~~flickr.photos.getFavorites~~
- * ~~flickr.photos.getInfo~~
- * ~~flickr.photos.getNotInSet~~
- * ~~flickr.photos.getPerms~~
- * ~~flickr.photos.getRecent~~
- * ~~flickr.photos.getSizes~~
- * ~~flickr.photos.getUntagged~~
- * ~~flickr.photos.getWithGeoData~~
- * ~~flickr.photos.getWithoutGeoData~~
- * ~~flickr.photos.recentlyUpdated~~
- * ~~flickr.photos.removeTag~~
- * ~~flickr.photos.search~~
- * ~~flickr.photos.setContentType~~
- * ~~flickr.photos.setDates~~
- * ~~flickr.photos.setMeta~~
- * ~~flickr.photos.setPerms~~
- * ~~flickr.photos.setSafetyLevel~~
- * ~~flickr.photos.setTags~~
 
-### photosets (in progress, 6/14)
+### photosets
  * flickr.photosets.addPhoto
  * flickr.photosets.create
  * flickr.photosets.delete
  * flickr.photosets.editMeta
- * ~~flickr.photosets.editPhotos~~
+ * flickr.photosets.editPhotos
  * ~~flickr.photosets.getContext~~
  * ~~flickr.photosets.getInfo~~
  * flickr.photosets.getList
  * flickr.photosets.getPhotos
  * ~~flickr.photosets.orderSets~~
- * ~~flickr.photosets.removePhoto~~
+ * flickr.photosets.removePhoto
  * ~~flickr.photosets.removePhotos~~
  * ~~flickr.photosets.reorderPhotos~~
  * ~~flickr.photosets.setPrimaryPhoto~~
