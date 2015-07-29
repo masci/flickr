@@ -211,3 +211,39 @@ func EditPhotos(client *flickr.FlickrClient, photosetId, primaryId string, photo
 	err := flickr.DoPost(client, response)
 	return response, err
 }
+
+func GetInfo() {
+
+}
+
+func OrderSets() {
+
+}
+
+// Remove multiple photos from a photoset.
+// This method requires authentication with 'write' permission.
+func RemovePhotos(client *flickr.FlickrClient, photosetId string, photoIds []string) (*flickr.BasicResponse, error) {
+	client.Init()
+	client.HTTPVerb = "POST"
+	client.Args.Set("method", "flickr.photosets.removePhotos")
+	client.Args.Set("photoset_id", photosetId)
+	photos := strings.Join(photoIds, ",")
+	client.Args.Set("photo_ids", photos)
+
+	client.OAuthSign()
+
+	response := &flickr.BasicResponse{}
+	err := flickr.DoPost(client, response)
+	return response, err
+}
+
+// Alias for EditPhotos
+func ReorderPhotos(client *flickr.FlickrClient, photosetId, primaryId string, photoIds []string) (*flickr.BasicResponse, error) {
+	return EditPhotos(client, photosetId, primaryId, photoIds)
+}
+
+// Set photoset primary photo
+// This method requires authentication with 'write' permission.
+func SetPrimaryPhoto(client *flickr.FlickrClient, photosetId, primaryId string) (*flickr.BasicResponse, error) {
+	return nil, nil
+}
