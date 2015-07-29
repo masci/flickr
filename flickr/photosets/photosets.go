@@ -3,6 +3,7 @@ package photosets
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/masci/flickr.go/flickr"
 )
@@ -185,6 +186,24 @@ func EditMeta(client *flickr.FlickrClient, photosetId, title, description string
 	if description != "" {
 		client.Args.Set("description", description)
 	}
+
+	client.OAuthSign()
+
+	response := &flickr.BasicResponse{}
+	err := flickr.DoPost(client, response)
+	return response, err
+}
+
+// Modify the photos in a photoset. Use this method to add, remove and re-order photos.
+// This method requires authentication with 'write' permission.
+func EditPhotos(client *flickr.FlickrClient, photosetId, primaryId string, photoIds []string) (*flickr.BasicResponse, error) {
+	client.Init()
+	client.HTTPVerb = "POST"
+	client.Args.Set("method", "flickr.photosets.editPhotos")
+	client.Args.Set("photoset_id", photosetId)
+	client.Args.Set("primary_photo_id", primaryId)
+	photos := strings.Join(photoIds, ",")
+	client.Args.Set("photo_ids", photos)
 
 	client.OAuthSign()
 
