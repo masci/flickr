@@ -118,15 +118,14 @@ These are methods that are not actually part of the Flickr API
  * flickr.photosets.delete
  * flickr.photosets.editMeta
  * flickr.photosets.editPhotos
- * ~~flickr.photosets.getContext~~
- * ~~flickr.photosets.getInfo~~
+ * flickr.photosets.getInfo
  * flickr.photosets.getList
  * flickr.photosets.getPhotos
- * ~~flickr.photosets.orderSets~~
+ * flickr.photosets.orderSets
  * flickr.photosets.removePhoto
- * ~~flickr.photosets.removePhotos~~
- * ~~flickr.photosets.reorderPhotos~~
- * ~~flickr.photosets.setPrimaryPhoto~~
+ * flickr.photosets.removePhotos
+ * flickr.photosets.reorderPhotos
+ * flickr.photosets.setPrimaryPhoto
 
 ### test
  * flickr.test.echo
