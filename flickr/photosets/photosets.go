@@ -235,8 +235,21 @@ func GetInfo(client *flickr.FlickrClient, authenticate bool, photosetId, ownerID
 	return response, err
 }
 
-func OrderSets() {
+// Set the order of photosets for the calling user.
+// Any set IDs not given in the list will be set to appear at the end of the list, ordered by their IDs.
+// This method requires authentication with 'write' permission.
+func OrderSets(client *flickr.FlickrClient, photosetIds []string) (*flickr.BasicResponse, error) {
+	client.Init()
+	client.HTTPVerb = "POST"
+	client.Args.Set("method", "flickr.photosets.orderSets")
+	sets := strings.Join(photosetIds, ",")
+	client.Args.Set("photoset_ids", sets)
 
+	client.OAuthSign()
+
+	response := &flickr.BasicResponse{}
+	err := flickr.DoPost(client, response)
+	return response, err
 }
 
 // Remove multiple photos from a photoset.

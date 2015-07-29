@@ -357,3 +357,29 @@ func TestGetInfo(t *testing.T) {
 	params = append(params, "user_id")
 	flickr.AssertParamsInBody(t, fclient, params)
 }
+
+func TestOrderSet(t *testing.T) {
+	fclient := flickr.GetTestClient()
+	server, client := flickr.FlickrMock(200, `<rsp stat="ok"></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	_, err := OrderSets(fclient, []string{"72157654991267328", "123456"})
+	flickr.Expect(t, err, nil)
+
+	server, client = flickr.FlickrMock(200, `<rsp stat="fail"><err code="99" msg="Insufficient permissions."/></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	resp, err := OrderSets(fclient, []string{"72157654991267328", "123456"})
+	_, ok := err.(*flickErr.Error)
+	flickr.Expect(t, ok, true)
+	flickr.Expect(t, resp.HasErrors(), true)
+
+	// check params, reset Flickr client to dismiss mocked responses
+	fclient = flickr.GetTestClient()
+	OrderSets(fclient, []string{"72157654991267328", "123456"})
+	params := []string{"photoset_ids"}
+	flickr.AssertParamsInBody(t, fclient, params)
+
+}
