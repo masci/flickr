@@ -245,5 +245,15 @@ func ReorderPhotos(client *flickr.FlickrClient, photosetId, primaryId string, ph
 // Set photoset primary photo
 // This method requires authentication with 'write' permission.
 func SetPrimaryPhoto(client *flickr.FlickrClient, photosetId, primaryId string) (*flickr.BasicResponse, error) {
-	return nil, nil
+	client.Init()
+	client.HTTPVerb = "POST"
+	client.Args.Set("method", "flickr.photosets.setPrimaryPhoto")
+	client.Args.Set("photoset_id", photosetId)
+	client.Args.Set("photo_id", primaryId)
+
+	client.OAuthSign()
+
+	response := &flickr.BasicResponse{}
+	err := flickr.DoPost(client, response)
+	return response, err
 }
