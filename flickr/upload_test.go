@@ -70,14 +70,14 @@ func TestGetUploadBody(t *testing.T) {
 	Expect(t, strings.Contains(body.String(), "foo"), true)
 }
 
-func TestUploadPhoto(t *testing.T) {
+func TestUploadFile(t *testing.T) {
 	fclient := GetTestClient()
 	server, client := FlickrMock(200, `<?xml version="1.0" encoding="utf-8" ?><rsp stat="ok"></rsp>`, "")
 	defer server.Close()
 	fclient.HTTPClient = client
 	params := NewUploadParams()
 
-	resp, err := UploadPhoto(fclient, "", params)
+	resp, err := UploadFile(fclient, "", params)
 	Expect(t, resp == nil, true) // comparing nil interfaces would fail
 	_, ok := err.(*os.PathError)
 	Expect(t, ok, true)
@@ -85,11 +85,11 @@ func TestUploadPhoto(t *testing.T) {
 	fooFile, err := ioutil.TempFile("", "flickr.go")
 	defer fooFile.Close()
 	Expect(t, err, nil)
-	resp, err = UploadPhoto(fclient, fooFile.Name(), params)
+	resp, err = UploadFile(fclient, fooFile.Name(), params)
 	Expect(t, resp.HasErrors(), false)
 }
 
-func TestUploadPhotoKo(t *testing.T) {
+func TestUploadFileKo(t *testing.T) {
 	fclient := GetTestClient()
 	server, client := FlickrMock(200, `<?xml version="1.0" encoding="utf-8" ?><rsp stat="fail"></rsp>`, "")
 	defer server.Close()
@@ -97,7 +97,7 @@ func TestUploadPhotoKo(t *testing.T) {
 
 	fooFile, err := ioutil.TempFile("", "flickr.go")
 	defer fooFile.Close()
-	resp, err := UploadPhoto(fclient, fooFile.Name(), nil)
+	resp, err := UploadFile(fclient, fooFile.Name(), nil)
 	_, ok := err.(*flickErr.Error)
 	Expect(t, ok, true)
 	Expect(t, resp.HasErrors(), true)

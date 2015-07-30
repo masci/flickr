@@ -102,7 +102,18 @@ func fillArgsWithParams(client *FlickrClient, params *UploadParams) {
 // no parameters will be added to the request and Flickr will set User's
 // default preferences.
 // This call must be signed with write permissions
-func UploadPhoto(client *FlickrClient, path string, optionalParams *UploadParams) (*UploadResponse, error) {
+func UploadFile(client *FlickrClient, path string, optionalParams *UploadParams) (*UploadResponse, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	return UploadReader(client, file, file.Name(), optionalParams)
+}
+
+//
+func UploadReader(client *FlickrClient, photoReader io.Reader, name string, optionalParams *UploadParams) (*UploadResponse, error) {
 	client.EndpointUrl = UPLOAD_ENDPOINT
 	client.HTTPVerb = "POST"
 	client.SetOAuthDefaults()
@@ -113,13 +124,7 @@ func UploadPhoto(client *FlickrClient, path string, optionalParams *UploadParams
 
 	client.OAuthSign()
 
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	body, ctype, err := getUploadBody(client, file, file.Name())
+	body, ctype, err := getUploadBody(client, photoReader, name)
 	if err != nil {
 		return nil, err
 	}

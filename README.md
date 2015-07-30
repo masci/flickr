@@ -35,14 +35,14 @@ Different methods may return different kind of responses.
 
 There are a number of functions that don't map any actual Flickr Api method
 (see below for the detailed list). For example, to upload a photo, you call the 
-`UploadPhoto` function in the `flickr` package:
+`UploadFile` or `UploadReader` functions in the `flickr` package:
 
 ```go
 import "github.com/masci/flickr.go/flickr"
 
 
 // upload the image file with default (nil) options
-resp, err := flickr.UploadPhoto(client, "/path/to/image", nil)
+resp, err := flickr.UploadFile(client, "/path/to/image", nil)
 ```
 
 ### Authentication (or how to retrieve OAuth credentials)

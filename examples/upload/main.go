@@ -39,7 +39,7 @@ func main() {
 	path, _ := filepath.Abs("examples/upload/gopher.jpg")
 	params := flickr.NewUploadParams()
 	params.Title = "A Gopher"
-	resp, err := flickr.UploadPhoto(client, path, params)
+	resp, err := flickr.UploadFile(client, path, params)
 	if err != nil {
 		fmt.Println("Failed uploading:", err, resp.ErrorMsg())
 		os.Exit(1)
@@ -60,7 +60,7 @@ func main() {
 
 	// upload another photo using default params
 	path, _ = filepath.Abs("examples/upload/gophers.jpg")
-	resp, err = flickr.UploadPhoto(client, path, nil)
+	resp, err = flickr.UploadFile(client, path, nil)
 	if err != nil {
 		fmt.Println("Failed uploading:", err, resp.ErrorMsg())
 		os.Exit(1)
