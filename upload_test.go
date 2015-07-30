@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	flickErr "github.com/masci/flickr.go/flickr/error"
+	flickErr "github.com/masci/flickr/error"
 )
 
 func TestNewUploadParams(t *testing.T) {

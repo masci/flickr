@@ -1,7 +1,7 @@
 package photos
 
 import (
-	"github.com/masci/flickr.go/flickr"
+	"github.com/masci/flickr"
 )
 
 // Delete a photo from Flickr
