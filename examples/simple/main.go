@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/masci/flickr.go/flickr"
-	"github.com/masci/flickr.go/flickr/test"
+	"github.com/masci/flickr"
+	"github.com/masci/flickr/test"
 )
 
 func main() {
