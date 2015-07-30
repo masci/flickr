@@ -1,4 +1,4 @@
-# flickr.go
+# flickr
 
 A go library to easily consume Flickr API.
 The project is currently under heavy development, so it hasn't a version number yet.
@@ -9,14 +9,15 @@ The project is currently under heavy development, so it hasn't a version number 
 
 ## Usage
 
-Flickr.go aims to expose a Go Api matching Flickr REST Api, so that you don't need
+`flickr` aims to expose a Go Api matching Flickr REST Api, so that you don't need
 to build HTTP requests and parse HTTP response manually. For example, the Flickr
 method `flickr.photosets.create` is implemented with the `Create` function in the `flickr/photosets`
 package:
 
 ```go
 import "fmt"
-import "github.com/masci/flickr.go/flickr/photosets"
+import "github.com/masci/flickr"
+import "github.com/masci/flickr/photosets"
 
 // create an API client with credentials
 client := flickr.NewFlickrClient("your_apikey", "your_apisecret")
@@ -27,7 +28,7 @@ response, _ := photosets.Create(client, "My Set", "Description", "primary_photo_
 fmt.Println("New photoset created:", response.Photoset.Id)
 ```
 
-Flickr.go responses implement `flickr.FlickrResponse` interface. A response contains error codes 
+`flickr` responses implement `flickr.FlickrResponse` interface. A response contains error codes 
 and error messages (if any) produced by Flickr or the specific data returned by the api call. 
 Different methods may return different kind of responses.
 
@@ -38,7 +39,7 @@ There are a number of functions that don't map any actual Flickr Api method
 `UploadFile` or `UploadReader` functions in the `flickr` package:
 
 ```go
-import "github.com/masci/flickr.go/flickr"
+import "github.com/masci/flickr"
 
 
 // upload the image file with default (nil) options
@@ -47,12 +48,12 @@ resp, err := flickr.UploadFile(client, "/path/to/image", nil)
 
 ### Authentication (or how to retrieve OAuth credentials)
 
-Several api calls must be authenticated and authorized: flickr.go only supports
+Several api calls must be authenticated and authorized: `flickr` only supports
 OAuth since the original token-based method has been deprecated by Flickr. This
 is an example describing the OAuth worflow from a command line application:
 
 ```go
-import "github.com/masci/flickr.go/flickr"
+import "github.com/masci/flickr"
 
 client := flickr.NewFlickrClient("your_apikey", "your_apisecret")
 
@@ -81,7 +82,7 @@ already mapped, you can do it manually:
 
 ```go
 import "fmt"
-import "github.com/masci/flickr.go/flickr"
+import "github.com/masci/flickr"
 
 client := flickr.NewFlickrClient("your_apikey", "your_apisecret")
 client.Args.Set("method", "flickr.cameras.getBrandModels")
