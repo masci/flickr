@@ -26,6 +26,7 @@ type Photoset struct {
 	Title             string `xml:"title"`
 	Description       string `xml:"description"`
 	Url               string `xml:"url,attr"`
+	Owner             string `xml:"owner,attr"`
 }
 
 type Photo struct {
