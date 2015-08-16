@@ -1,10 +1,8 @@
 package flickr
 
 import (
-	"bytes"
 	"io/ioutil"
 	"os"
-	"strings"
 	"testing"
 
 	flickErr "github.com/masci/flickr/error"
@@ -60,16 +58,6 @@ func TestFillArgsWithParams(t *testing.T) {
 	Expect(t, client.Args.Get("safety_level"), "")
 }
 
-func TestGetUploadBody(t *testing.T) {
-	client := GetTestClient()
-	photo := bytes.NewBufferString("foo")
-	body, ctype, err := getUploadBody(client, photo, "fnam")
-
-	Expect(t, err, nil)
-	Expect(t, strings.Contains(ctype, "multipart/form-data; boundary="), true)
-	Expect(t, strings.Contains(body.String(), "foo"), true)
-}
-
 func TestUploadFile(t *testing.T) {
 	fclient := GetTestClient()
 	server, client := FlickrMock(200, `<?xml version="1.0" encoding="utf-8" ?><rsp stat="ok"></rsp>`, "")
@@ -81,12 +69,6 @@ func TestUploadFile(t *testing.T) {
 	Expect(t, resp == nil, true) // comparing nil interfaces would fail
 	_, ok := err.(*os.PathError)
 	Expect(t, ok, true)
-
-	fooFile, err := ioutil.TempFile("", "flickr.go")
-	defer fooFile.Close()
-	Expect(t, err, nil)
-	resp, err = UploadFile(fclient, fooFile.Name(), params)
-	Expect(t, resp.HasErrors(), false)
 }
 
 func TestUploadFileKo(t *testing.T) {
