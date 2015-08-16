@@ -1,39 +1,59 @@
 package flickr
 
 import (
-	"bytes"
+	"crypto/rand"
+	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 )
 
+func randomBoundary() string {
+	var buf [30]byte
+	_, err := io.ReadFull(rand.Reader, buf[:])
+	if err != nil {
+		panic(err)
+	}
+	return fmt.Sprintf("%x", buf[:])
+}
+
 // Encode the file and request parameters in a multipart body
-func getUploadBody(client *FlickrClient, photo io.Reader, fileName string) (*bytes.Buffer, string, error) {
-	// instance an empty request body
-	body := &bytes.Buffer{}
+func streamUploadBody(client *FlickrClient, photo io.Reader, body *io.PipeWriter, fileName string, boundary string) {
 	// multipart writer to fill the body
+	defer body.Close()
 	writer := multipart.NewWriter(body)
-	// dump the file in the "photo" field
+	writer.SetBoundary(boundary)
+
+	// create the "photo" field
 	part, err := writer.CreateFormFile("photo", filepath.Base(fileName))
 	if err != nil {
-		return nil, "", err
+		log.Fatal(err)
+		return
 	}
+
+	// fill the photo field
 	_, err = io.Copy(part, photo)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
 	// dump other params
 	for key, val := range client.Args {
 		_ = writer.WriteField(key, val[0])
 	}
+
+	// close the form writer
 	err = writer.Close()
 	if err != nil {
-		return nil, "", err
+		log.Fatal(err)
+		return
 	}
-	// evaluate the content type and the boundary
-	contentType := writer.FormDataContentType()
-
-	return body, contentType, nil
 }
 
 // A convenience struct wrapping all optional upload parameters
@@ -124,12 +144,28 @@ func UploadReader(client *FlickrClient, photoReader io.Reader, name string, opti
 
 	client.OAuthSign()
 
-	body, ctype, err := getUploadBody(client, photoReader, name)
+	// write request body in a Pipe
+	boundary := randomBoundary()
+	r, w := io.Pipe()
+	go streamUploadBody(client, photoReader, w, name, boundary)
+
+	// create an HTTP Request
+	req, err := http.NewRequest("POST", client.EndpointUrl, r)
 	if err != nil {
 		return nil, err
 	}
 
-	resp := &UploadResponse{}
-	err = DoPostBody(client, body, ctype, resp)
-	return resp, err
+	// set content-type
+	req.Header.Set("Content-Type", "multipart/form-data; boundary="+boundary)
+
+	// instance HTTP client
+	http_client := &http.Client{}
+	resp, err := http_client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	api_resp := &UploadResponse{}
+	err = parseApiResponse(resp, api_resp)
+	return api_resp, err
 }
