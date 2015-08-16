@@ -114,9 +114,9 @@ func UploadFile(client *FlickrClient, path string, optionalParams *UploadParams)
 
 //
 func UploadReader(client *FlickrClient, photoReader io.Reader, name string, optionalParams *UploadParams) (*UploadResponse, error) {
+	client.Init()
 	client.EndpointUrl = UPLOAD_ENDPOINT
 	client.HTTPVerb = "POST"
-	client.SetOAuthDefaults()
 
 	if optionalParams != nil {
 		fillArgsWithParams(client, optionalParams)
