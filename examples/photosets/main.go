@@ -53,5 +53,5 @@ func main() {
 	*/
 
 	response, _ := photosets.GetInfo(client, true, "72157656097802609", "")
-	fmt.Println(fmt.Sprintf("%+v", *response))
+	fmt.Println(response.Set.Title)
 }
