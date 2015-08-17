@@ -13,6 +13,8 @@ import (
 	"strings"
 )
 
+// generate a random multipart boundary string,
+// shamelessly copypasted from the std library
 func randomBoundary() string {
 	var buf [30]byte
 	_, err := io.ReadFull(rand.Reader, buf[:])
@@ -22,7 +24,8 @@ func randomBoundary() string {
 	return fmt.Sprintf("%x", buf[:])
 }
 
-// Encode the file and request parameters in a multipart body
+// Encode the file and request parameters in a multipart body.
+// File contents are streamed into the request using an io.Pipe in a separated goroutine
 func streamUploadBody(client *FlickrClient, photo io.Reader, body *io.PipeWriter, fileName string, boundary string) {
 	// multipart writer to fill the body
 	defer body.Close()
@@ -132,7 +135,7 @@ func UploadFile(client *FlickrClient, path string, optionalParams *UploadParams)
 	return UploadReader(client, file, file.Name(), optionalParams)
 }
 
-//
+// Same as UploadFile but the photo file is passed as an io.Reader instead of a file path
 func UploadReader(client *FlickrClient, photoReader io.Reader, name string, optionalParams *UploadParams) (*UploadResponse, error) {
 	client.Init()
 	client.EndpointUrl = UPLOAD_ENDPOINT
@@ -158,8 +161,9 @@ func UploadReader(client *FlickrClient, photoReader io.Reader, name string, opti
 	// set content-type
 	req.Header.Set("Content-Type", "multipart/form-data; boundary="+boundary)
 
-	// instance HTTP client
+	// instance an HTTP client
 	http_client := &http.Client{}
+	// perform upload request streaming the file
 	resp, err := http_client.Do(req)
 	if err != nil {
 		return nil, err
