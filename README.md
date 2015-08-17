@@ -45,6 +45,7 @@ import "github.com/masci/flickr"
 // upload the image file with default (nil) options
 resp, err := flickr.UploadFile(client, "/path/to/image", nil)
 ```
+Files are uploaded through an io.Pipe fueled in a separate goroutine, so the process is pretty efficient.
 
 ### Authentication (or how to retrieve OAuth credentials)
 
