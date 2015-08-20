@@ -3,9 +3,9 @@
 A go library to easily consume Flickr API.
 The project is currently under heavy development, so it hasn't a version number yet.
 
-[![GoDoc](https://godoc.org/github.com/masci/flickr.go?status.svg)](https://godoc.org/github.com/masci/flickr.go)
-[![Build Status](https://travis-ci.org/masci/flickr.svg)](https://travis-ci.org/masci/flickr.go)
-[![Coverage Status](https://coveralls.io/repos/masci/flickr/badge.svg)](https://coveralls.io/r/masci/flickr.go)
+[![GoDoc](https://godoc.org/github.com/masci/flickr?status.svg)](https://godoc.org/github.com/masci/flickr)
+[![Build Status](https://travis-ci.org/masci/flickr.svg)](https://travis-ci.org/masci/flickr)
+[![Coverage Status](https://coveralls.io/repos/masci/flickr/badge.svg)](https://coveralls.io/r/masci/flickr)
 
 ## Usage
 
