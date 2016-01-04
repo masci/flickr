@@ -113,6 +113,8 @@ These are methods that are not actually part of the Flickr API
 
 ### photos
  * flickr.photos.delete
+ * flickr.photos.getInfo
+ * flickr.photos.setDates
 
 ### photosets
  * flickr.photosets.addPhoto
