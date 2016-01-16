@@ -12,9 +12,9 @@ const (
 )
 
 var errors = map[int]string{
-	ApiError:          "Flickr API returned an error, check the response for details",
-	RequestTokenError: "An error occurred during token request, check the response for details",
-	OAuthTokenError:   "An error occurred while getting the OAuth token, check the response for details",
+	ApiError:          "Flickr API returned an error: ",
+	RequestTokenError: "An error occurred during token request: ",
+	OAuthTokenError:   "An error occurred while getting the OAuth token: ",
 }
 
 type Error struct {
@@ -27,9 +27,9 @@ func (e Error) Error() string {
 	return e.Message
 }
 
-func NewError(errorCode int) *Error {
+func NewError(errorCode int, message string) *Error {
 	return &Error{
 		ErrorCode: errorCode,
-		Message:   errors[errorCode],
+		Message:   errors[errorCode] + message,
 	}
 }
