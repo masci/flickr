@@ -25,8 +25,8 @@ func main() {
 
 	// do not proceed if credentials were not provided
 	if apik == "" || apisec == "" || token == "" || tokenSecret == "" {
-		fmt.Fprintln(os.Stderr, "Please set FLICKRGO_API_KEY, FLICKRGO_API_SECRET "+
-			"and FLICKRGO_OAUTH_TOKEN env vars")
+		fmt.Fprintln(os.Stderr, "Please set FLICKRGO_API_KEY, FLICKRGO_API_SECRET, "+
+			"FLICKRGO_OAUTH_TOKEN and FLICKRGO_OAUTH_TOKEN_SECRET env vars")
 		os.Exit(1)
 	}
 
@@ -36,7 +36,7 @@ func main() {
 	client.OAuthTokenSecret = tokenSecret
 
 	// upload a photo
-	path, _ := filepath.Abs("examples/upload/gopher.jpg")
+	path, _ := filepath.Abs("gopher.jpg")
 	params := flickr.NewUploadParams()
 	params.Title = "A Gopher"
 	resp, err := flickr.UploadFile(client, path, params)
@@ -62,7 +62,7 @@ func main() {
 	}
 
 	// upload another photo using default params
-	path, _ = filepath.Abs("examples/upload/gophers.jpg")
+	path, _ = filepath.Abs("gophers.jpg")
 	resp, err = flickr.UploadFile(client, path, nil)
 	if err != nil {
 		fmt.Println("Failed uploading:", err)
