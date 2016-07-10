@@ -47,12 +47,12 @@ func main() {
 		}
 		os.Exit(1)
 	} else {
-		fmt.Println("Photo uploaded, id:", resp.Id)
+		fmt.Println("Photo uploaded, id:", resp.ID)
 		pause()
 	}
 
 	// create a photoset using above photo as primary
-	respS, err := photosets.Create(client, "A Set", "", resp.Id)
+	respS, err := photosets.Create(client, "A Set", "", resp.ID)
 	if err != nil {
 		fmt.Println("Failed creating set:", respS.ErrorMsg())
 		os.Exit(1)
@@ -71,22 +71,22 @@ func main() {
 		}
 		os.Exit(1)
 	} else {
-		fmt.Println("Photo uploaded, id:", resp.Id)
+		fmt.Println("Photo uploaded, id:", resp.ID)
 		pause()
 	}
 
 	// assign above photo to the photoset
-	respAdd, err := photosets.AddPhoto(client, respS.Set.Id, resp.Id)
+	respAdd, err := photosets.AddPhoto(client, respS.Set.Id, resp.ID)
 	if err != nil {
 		fmt.Println("Failed adding photo to the set:", err, respAdd.ErrorMsg())
 		os.Exit(1)
 	} else {
-		fmt.Println("Added photo", resp.Id, "to set", respS.Set.Id)
+		fmt.Println("Added photo", resp.ID, "to set", respS.Set.Id)
 		pause()
 	}
 
 	// remove the photo from the photoset
-	respRemP, err := photosets.RemovePhoto(client, respS.Set.Id, resp.Id)
+	respRemP, err := photosets.RemovePhoto(client, respS.Set.Id, resp.ID)
 	if err != nil {
 		fmt.Println("Failed removing photo from the set:", err)
 		if respRemP != nil {
@@ -94,7 +94,7 @@ func main() {
 		}
 		os.Exit(1)
 	} else {
-		fmt.Println("Removed photo", resp.Id, "from set", respS.Set.Id)
+		fmt.Println("Removed photo", resp.ID, "from set", respS.Set.Id)
 		pause()
 	}
 
@@ -112,7 +112,7 @@ func main() {
 	}
 
 	// delete the photo
-	respD, err := photos.Delete(client, resp.Id)
+	respD, err := photos.Delete(client, resp.ID)
 	if err != nil {
 		fmt.Println("Failed deleting photo:", err)
 		if respD != nil {
