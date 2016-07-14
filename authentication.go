@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	flickErr "github.com/masci/flickr/error"
+	flickErr "gopkg.in/masci/flickr.v1/error"
 )
 
 // Type representing a request token during the exchange process
