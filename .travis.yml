@@ -4,6 +4,7 @@ go_import_path: gopkg.in/masci/flickr.v2
 
 go:
     - 1.6.2
+    - 1.7rc1
 
 install:
   - go get github.com/mattn/goveralls
