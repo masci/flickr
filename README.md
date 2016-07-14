@@ -16,8 +16,8 @@ package:
 
 ```go
 import "fmt"
-import "github.com/masci/flickr"
-import "github.com/masci/flickr/photosets"
+import "gopkg.in/masci/flickr.v2"
+import "gopkg.in/masci/flickr.v2/photosets"
 
 // create an API client with credentials
 client := flickr.NewFlickrClient("your_apikey", "your_apisecret")
@@ -28,18 +28,18 @@ response, _ := photosets.Create(client, "My Set", "Description", "primary_photo_
 fmt.Println("New photoset created:", response.Photoset.Id)
 ```
 
-`flickr` responses implement `flickr.FlickrResponse` interface. A response contains error codes 
-and error messages (if any) produced by Flickr or the specific data returned by the api call. 
+`flickr` responses implement `flickr.FlickrResponse` interface. A response contains error codes
+and error messages (if any) produced by Flickr or the specific data returned by the api call.
 Different methods may return different kind of responses.
 
 ### Upload a photo
 
 There are a number of functions that don't map any actual Flickr Api method
-(see below for the detailed list). For example, to upload a photo, you call the 
+(see below for the detailed list). For example, to upload a photo, you call the
 `UploadFile` or `UploadReader` functions in the `flickr` package:
 
 ```go
-import "github.com/masci/flickr"
+import "gopkg.in/masci/flickr.v2"
 
 
 // upload the image file with default (nil) options
@@ -54,7 +54,7 @@ OAuth since the original token-based method has been deprecated by Flickr. This
 is an example describing the OAuth worflow from a command line application:
 
 ```go
-import "github.com/masci/flickr"
+import "gopkg.in/masci/flickr.v2"
 
 client := flickr.NewFlickrClient("your_apikey", "your_apisecret")
 
@@ -83,7 +83,7 @@ already mapped, you can do it manually:
 
 ```go
 import "fmt"
-import "github.com/masci/flickr"
+import "gopkg.in/masci/flickr.v2"
 
 client := flickr.NewFlickrClient("your_apikey", "your_apisecret")
 client.Args.Set("method", "flickr.cameras.getBrandModels")
@@ -97,6 +97,13 @@ if err == nil {
 ```
 
 Checkout the `example` folder and the docs pages for more details.
+
+## Note on Go versions
+
+The latest version `v2` only supports go `1.6` and above, for Go < 1.6 use the v1 package:
+```
+go get gopkg.in/masci/flickr.v1
+```
 
 ## API Methods
 
@@ -135,4 +142,3 @@ These are methods that are not actually part of the Flickr API
  * flickr.test.echo
  * flickr.test.login
  * flickr.test.null
-
