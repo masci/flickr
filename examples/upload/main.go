@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/masci/flickr"
-	"github.com/masci/flickr/photos"
-	"github.com/masci/flickr/photosets"
+	"gopkg.in/masci/flickr.v2"
+	"gopkg.in/masci/flickr.v2/photos"
+	"gopkg.in/masci/flickr.v2/photosets"
 )
 
 func main() {

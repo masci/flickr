@@ -3,8 +3,8 @@ package photosets
 import (
 	"testing"
 
-	"github.com/masci/flickr"
-	flickErr "github.com/masci/flickr/error"
+	"gopkg.in/masci/flickr.v2"
+	flickErr "gopkg.in/masci/flickr.v2/error"
 )
 
 var (
