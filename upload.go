@@ -2,6 +2,7 @@ package flickr
 
 import (
 	"crypto/rand"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"log"
@@ -160,11 +161,21 @@ func UploadReader(client *FlickrClient, photoReader io.Reader, name string, opti
 
 	// set content-type
 	req.Header.Set("content-type", "multipart/form-data; boundary="+boundary)
-	req.Header.Set("transfer-encoding", "chunked")
 	req.ContentLength = -1 // unknown
 
+	// Create a Transport to explicitly use the http1.1 client
+	// TODO: for some reason, when we use the http2 client flickr API responds
+	// with HTTP: 411 (No Content Length : POST) whereas it should be ok to
+	// upload using chunks. Explicitly setting `req.Header.Set("transfer-encoding", "chunked")`
+	// does not help and try to compute the request size isn't the right thing to do IMHO.
+	// We should investigate why this happens instead of forcing the downgrade to http1.1.
+	tr := &http.Transport{
+		TLSNextProto: make(map[string]func(authority string, c *tls.Conn) http.RoundTripper),
+	}
+
 	// instance an HTTP client
-	httpClient := &http.Client{}
+	httpClient := &http.Client{Transport: tr}
+
 	// perform upload request streaming the file
 	resp, err := httpClient.Do(req)
 	if err != nil {
