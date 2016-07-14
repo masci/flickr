@@ -100,7 +100,7 @@ Checkout the `example` folder and the docs pages for more details.
 
 ## Note on Go versions
 
-The latest version `v2` only supports go `1.6` and above, for Go < 1.6 use the v1 package:
+The latest version `v2` only supports go `1.6` and above, for Go `< 1.6` use the `v1` package:
 ```
 go get gopkg.in/masci/flickr.v1
 ```
