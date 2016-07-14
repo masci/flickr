@@ -3,8 +3,7 @@ language: go
 go_import_path: gopkg.in/masci/flickr.v2
 
 go:
-    - 1.6
-    - 1.7rc1
+    - 1.6.2
 
 install:
   - go get github.com/mattn/goveralls
