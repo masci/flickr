@@ -138,6 +138,11 @@ func UploadFile(client *FlickrClient, path string, optionalParams *UploadParams)
 
 // UploadReader does same as UploadFile but the photo file is passed as an io.Reader instead of a file path
 func UploadReader(client *FlickrClient, photoReader io.Reader, name string, optionalParams *UploadParams) (*UploadResponse, error) {
+	return UploadReaderWithClient(client, photoReader, name, optionalParams, nil)
+}
+
+// UploadReaderWithClient does same as UploadReader but allows passing a custom httpClient
+func UploadReaderWithClient(client *FlickrClient, photoReader io.Reader, name string, optionalParams *UploadParams, httpClient *http.Client) (*UploadResponse, error) {
 	client.Init()
 	client.EndpointUrl = UPLOAD_ENDPOINT
 	client.HTTPVerb = "POST"
@@ -163,18 +168,20 @@ func UploadReader(client *FlickrClient, photoReader io.Reader, name string, opti
 	req.Header.Set("content-type", "multipart/form-data; boundary="+boundary)
 	req.ContentLength = -1 // unknown
 
-	// Create a Transport to explicitly use the http1.1 client
-	// TODO: for some reason, when we use the http2 client flickr API responds
-	// with HTTP: 411 (No Content Length : POST) whereas it should be ok to
-	// upload using chunks. Explicitly setting `req.Header.Set("transfer-encoding", "chunked")`
-	// does not help and try to compute the request size isn't the right thing to do IMHO.
-	// We should investigate why this happens instead of forcing the downgrade to http1.1.
-	tr := &http.Transport{
-		TLSNextProto: make(map[string]func(authority string, c *tls.Conn) http.RoundTripper),
-	}
+	if (httpClient == nil) {
+		// Create a Transport to explicitly use the http1.1 client
+		// TODO: for some reason, when we use the http2 client flickr API responds
+		// with HTTP: 411 (No Content Length : POST) whereas it should be ok to
+		// upload using chunks. Explicitly setting `req.Header.Set("transfer-encoding", "chunked")`
+		// does not help and try to compute the request size isn't the right thing to do IMHO.
+		// We should investigate why this happens instead of forcing the downgrade to http1.1.
+		tr := &http.Transport{
+			TLSNextProto: make(map[string]func(authority string, c *tls.Conn) http.RoundTripper),
+		}
 
-	// instance an HTTP client
-	httpClient := &http.Client{Transport: tr}
+		// instance an HTTP client
+		httpClient = &http.Client{Transport: tr}
+	}
 
 	// perform upload request streaming the file
 	resp, err := httpClient.Do(req)
