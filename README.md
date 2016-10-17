@@ -86,12 +86,17 @@ import "fmt"
 import "gopkg.in/masci/flickr.v2"
 
 client := flickr.NewFlickrClient("your_apikey", "your_apisecret")
+client.Init()
 client.Args.Set("method", "flickr.cameras.getBrandModels")
 client.Args.Set("brand", "nikon")
 
+client.OAuthSign()
 response := &flickr.BasicResponse{}
-    err := flickr.DoGet(client, response)
-if err == nil {
+err := flickr.DoGet(client, response)
+
+if err != nil {
+    fmt.Printf("Error: %s", err)
+} else {
     fmt.Println("Api response:", response.Extra)
 }
 ```
