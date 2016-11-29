@@ -2,6 +2,7 @@ package flickr
 
 import (
 	"crypto/rand"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"log"
@@ -59,7 +60,7 @@ func streamUploadBody(client *FlickrClient, photo io.Reader, body *io.PipeWriter
 	}
 }
 
-// A convenience struct wrapping all optional upload parameters
+// UploadParams is a convenience struct wrapping all optional upload parameters
 type UploadParams struct {
 	Title, Description           string
 	Tags                         []string
@@ -69,7 +70,7 @@ type UploadParams struct {
 	SafetyLevel                  int
 }
 
-// Provide meaningful default values
+// NewUploadParams provides meaningful default values
 func NewUploadParams() *UploadParams {
 	ret := &UploadParams{}
 	ret.ContentType = 1 // photo
@@ -78,10 +79,10 @@ func NewUploadParams() *UploadParams {
 	return ret
 }
 
-// Type representing a successful upload response from the api
+// UploadResponse is a type representing a successful upload response from the api
 type UploadResponse struct {
 	BasicResponse
-	Id string `xml:"photoid"`
+	ID string `xml:"photoid"`
 }
 
 // Set client query arguments based on the contents of the UploadParams struct
@@ -121,7 +122,7 @@ func fillArgsWithParams(client *FlickrClient, params *UploadParams) {
 	}
 }
 
-// Perform a file upload using the Flickr API. If optionalParams is nil,
+// UploadFile performs a file upload using the Flickr API. If optionalParams is nil,
 // no parameters will be added to the request and Flickr will set User's
 // default preferences.
 // This call must be signed with write permissions
@@ -135,7 +136,7 @@ func UploadFile(client *FlickrClient, path string, optionalParams *UploadParams)
 	return UploadReader(client, file, file.Name(), optionalParams)
 }
 
-// Same as UploadFile but the photo file is passed as an io.Reader instead of a file path
+// UploadReader does same as UploadFile but the photo file is passed as an io.Reader instead of a file path
 func UploadReader(client *FlickrClient, photoReader io.Reader, name string, optionalParams *UploadParams) (*UploadResponse, error) {
 	client.Init()
 	client.EndpointUrl = UPLOAD_ENDPOINT
@@ -159,17 +160,29 @@ func UploadReader(client *FlickrClient, photoReader io.Reader, name string, opti
 	}
 
 	// set content-type
-	req.Header.Set("Content-Type", "multipart/form-data; boundary="+boundary)
+	req.Header.Set("content-type", "multipart/form-data; boundary="+boundary)
+	req.ContentLength = -1 // unknown
+
+	// Create a Transport to explicitly use the http1.1 client
+	// TODO: for some reason, when we use the http2 client flickr API responds
+	// with HTTP: 411 (No Content Length : POST) whereas it should be ok to
+	// upload using chunks. Explicitly setting `req.Header.Set("transfer-encoding", "chunked")`
+	// does not help and try to compute the request size isn't the right thing to do IMHO.
+	// We should investigate why this happens instead of forcing the downgrade to http1.1.
+	tr := &http.Transport{
+		TLSNextProto: make(map[string]func(authority string, c *tls.Conn) http.RoundTripper),
+	}
 
 	// instance an HTTP client
-	http_client := &http.Client{}
+	httpClient := &http.Client{Transport: tr}
+
 	// perform upload request streaming the file
-	resp, err := http_client.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
-	api_resp := &UploadResponse{}
-	err = parseApiResponse(resp, api_resp)
-	return api_resp, err
+	apiResp := &UploadResponse{}
+	err = parseApiResponse(resp, apiResp)
+	return apiResp, err
 }

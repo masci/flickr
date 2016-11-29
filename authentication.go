@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	flickErr "github.com/masci/flickr/error"
+	flickErr "gopkg.in/masci/flickr.v2/error"
 )
 
 // Type representing a request token during the exchange process
@@ -33,7 +33,7 @@ func ParseRequestToken(response string) (*RequestToken, error) {
 	oauth_problem := val.Get("oauth_problem")
 	if oauth_problem != "" {
 		ret.OAuthProblem = oauth_problem
-		return ret, flickErr.NewError(20)
+		return ret, flickErr.NewError(flickErr.RequestTokenError, oauth_problem)
 	}
 
 	confirmed, _ := strconv.ParseBool(val.Get("oauth_callback_confirmed"))
@@ -72,7 +72,7 @@ func ParseOAuthToken(response string) (*OAuthToken, error) {
 	oauth_problem := val.Get("oauth_problem")
 	if oauth_problem != "" {
 		ret.OAuthProblem = oauth_problem
-		return ret, flickErr.NewError(30)
+		return ret, flickErr.NewError(flickErr.OAuthTokenError, oauth_problem)
 	}
 
 	ret.OAuthToken = val.Get("oauth_token")

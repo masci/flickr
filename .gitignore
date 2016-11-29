@@ -27,3 +27,4 @@ flick-rsync
 coverage.out
 profile.cov
 .DS_Store
+.env

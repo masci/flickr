@@ -62,7 +62,7 @@ func FlickrMock(code int, body string, contentType string) (*httptest.Server, *h
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(code)
-		w.Header().Set("Content-Type", contentType)
+		w.Header().Set("content-type", contentType)
 		fmt.Fprintln(w, body)
 	}))
 
