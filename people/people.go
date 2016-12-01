@@ -144,62 +144,64 @@ const (
 	Private
 )
 
-// XXX: add optional arguments here
+type GetPhotosOptionalArgs struct {
+	SafeSearch    SafetyLevel       // optional, set to NoneSpecified to ignore
+	MinUploadDate string            // optional, set to "" to ignore. mysql datetime
+	MaxUploadDate string            // optional, set to "" to ignore. mysql datetime
+	MinTakenDate  string            // optional, set to "" to ignore. mysql datetime
+	MaxTakenDate  string            // optional, set to "" to ignore. mysql datetime
+	ContentType   ContentType       // optional, set to NoneSpecified to ignore
+	PrivacyFilter PrivacyFilterType // optional, set to NoneSpecified to ignore
+	Extras        string            // optional, set to "" to ignore. comma separated string.
+	PerPage       int               // 0 to ignore
+	Page          int               // 0 to ignore
+}
+
 func GetPhotos(client *flickr.FlickrClient,
-	userId string,
-	safeSearch SafetyLevel, // optional, set to NoneSpecified to ignore
-	minUploadDate string, // optional, set to "" to ignore. mysql datetime
-	maxUploadDate string, // optional, set to "" to ignore. mysql datetime
-	minTakenDate string, // optional, set to "" to ignore. mysql datetime
-	maxTakenDate string, // optional, set to "" to ignore. mysql datetime
-	contentType ContentType, // optional, set to NoneSpecified to ignore
-	privacyFilter PrivacyFilterType, // optional, set to NoneSpecified to ignore
-	extras string, // optional, set to "" to ignore. comma separated string.
-	perPage int, // 0 to ignore
-	page int /* 0 to ignore */) (*PhotoListResponse, error) {
+	userId string, opts GetPhotosOptionalArgs) (*PhotoListResponse, error) {
 	client.Init()
 	client.EndpointUrl = flickr.API_ENDPOINT
 	client.Args.Set("method", "flickr.people.getPhotos")
 	client.Args.Set("user_id", userId)
-	if safeSearch != NoSafetySpecified {
-		client.Args.Set("safe_search", strconv.Itoa(int(safeSearch)))
+	if opts.SafeSearch != NoSafetySpecified {
+		client.Args.Set("safe_search", strconv.Itoa(int(opts.SafeSearch)))
 	}
-	if minUploadDate != "" {
-		client.Args.Set("min_upload_date", minUploadDate)
+	if opts.MinUploadDate != "" {
+		client.Args.Set("min_upload_date", opts.MinUploadDate)
 	}
-	if maxUploadDate != "" {
-		client.Args.Set("min_upload_date", maxUploadDate)
+	if opts.MaxUploadDate != "" {
+		client.Args.Set("min_upload_date", opts.MaxUploadDate)
 	}
-	if minTakenDate != "" {
-		client.Args.Set("min_taken_date", minTakenDate)
+	if opts.MinTakenDate != "" {
+		client.Args.Set("min_taken_date", opts.MinTakenDate)
 	}
-	if maxTakenDate != "" {
-		client.Args.Set("max_taken_date", maxTakenDate)
+	if opts.MaxTakenDate != "" {
+		client.Args.Set("max_taken_date", opts.MaxTakenDate)
 	}
-	if contentType != NoContentTypeSpecified {
-		client.Args.Set("content_type", strconv.Itoa(int(contentType)))
+	if opts.ContentType != NoContentTypeSpecified {
+		client.Args.Set("content_type", strconv.Itoa(int(opts.ContentType)))
 	}
-	if privacyFilter != NoPrivacyFilterSpecified {
-		client.Args.Set("privacy_filter", strconv.Itoa(int(privacyFilter)))
+	if opts.PrivacyFilter != NoPrivacyFilterSpecified {
+		client.Args.Set("privacy_filter", strconv.Itoa(int(opts.PrivacyFilter)))
 	}
-	if perPage != 0 {
-		client.Args.Set("per_page", strconv.Itoa(perPage))
+	if opts.PerPage != 0 {
+		client.Args.Set("per_page", strconv.Itoa(opts.PerPage))
 	}
-	if page != 0 {
-		client.Args.Set("page", strconv.Itoa(page))
+	if opts.Page != 0 {
+		client.Args.Set("page", strconv.Itoa(opts.Page))
 	}
-	if extras != "" {
-		client.Args.Set("extras", extras)
+	if opts.Extras != "" {
+		client.Args.Set("extras", opts.Extras)
 	}
 	client.OAuthSign()
 	fmt.Println("client", client)
 
 	response := &PhotoListResponse{}
 	err := flickr.DoGet(client, response)
-	if err == nil {
-		fmt.Println("API response:", response.Extra)
-	} else {
-		fmt.Println("API error:", err)
-	}
+	//	if err == nil {
+	//		fmt.Println("API response:", response.Extra)
+	//	} else {
+	//		fmt.Println("API error:", err)
+	//	}
 	return response, err
 }
