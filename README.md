@@ -143,6 +143,9 @@ These are methods that are not actually part of the Flickr API
  * flickr.photosets.reorderPhotos
  * flickr.photosets.setPrimaryPhoto
 
+### people
+ * flickr.people.getPhotos
+
 ### test
  * flickr.test.echo
  * flickr.test.login
