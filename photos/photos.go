@@ -5,16 +5,16 @@ import (
 )
 
 type PhotoInfo struct {
-	Id             string `xml:"id,attr"`
-	Secret         string `xml:"secret,attr"`
-	Server         string `xml:"server,attr"`
-	Farm           string `xml:"farm,attr"`
-	DateUploaded   string `xml:"dateuploaded,attr"`
-	IsFavorite     bool   `xml:"isfavorite,attr"`
-	License        string `xml:"license,attr"`
+	Id           string `xml:"id,attr"`
+	Secret       string `xml:"secret,attr"`
+	Server       string `xml:"server,attr"`
+	Farm         string `xml:"farm,attr"`
+	DateUploaded string `xml:"dateuploaded,attr"`
+	IsFavorite   bool   `xml:"isfavorite,attr"`
+	License      string `xml:"license,attr"`
 	// NOTE: one less than safety level set on upload (ie, here 0 = safe, 1 = moderate, 2 = restricted)
 	//       while on upload, 1 = safe, 2 = moderate, 3 = restricted
-	SafetyLevel    int    `xml:"safety_level,attr"` 
+	SafetyLevel    int    `xml:"safety_level,attr"`
 	Rotation       int    `xml:"rotation,attr"`
 	OriginalSecret string `xml:"originalsecret,attr"`
 	OriginalFormat string `xml:"originalformat,attr"`
@@ -62,6 +62,30 @@ type PhotoInfo struct {
 type PhotoInfoResponse struct {
 	flickr.BasicResponse
 	Photo PhotoInfo `xml:"photo"`
+}
+type PrivacyType int64
+
+const (
+	yes PrivacyType = 1
+	no  PrivacyType = 0
+)
+
+// Set permission of a photo from flickr
+// this method requires authentica with 'write' permission
+func SetPerms(client *flickr.FlickrClient, id string, isPublic PrivacyType, IsFriend PrivacyType, isFamily PrivacyType) (*flickr.BasicResponse, error) {
+
+	client.Init()
+	client.EndpointUrl = flickr.API_ENDPOINT
+	client.HTTPVerb = "POST"
+	client.Args.Set("method", "flickr.photos.setPerms")
+	client.Args.Set("photo_id", id)
+	client.Args.Set("is_public", string(isPublic))
+	client.Args.Set("is_friend", string(IsFriend))
+	client.Args.Set("is_family", string(isFamily))
+	client.OAuthSign()
+	response := &flickr.BasicResponse{}
+	err := flickr.DoPost(client, response)
+	return response, err
 }
 
 // Delete a photo from Flickr
