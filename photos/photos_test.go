@@ -83,5 +83,9 @@ func TestGetTags(t *testing.T) {
 	if len(resp.Photo.Tags) <= 0 {
 		t.Error("Error in parsing.. size of tags should be greater than zero")
 	}
+	if resp.Photo.Tags[0].Raw != "body positive" {
+
+		t.Error("Error in parsing.. first value should be body positive")
+	}
 	flickr.Expect(t, resp.HasErrors(), false)
 }
