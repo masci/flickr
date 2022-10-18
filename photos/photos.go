@@ -1,6 +1,9 @@
 package photos
 
 import (
+	"strconv"
+	"strings"
+
 	"gopkg.in/masci/flickr.v2"
 )
 
@@ -52,11 +55,16 @@ type PhotoInfo struct {
 		CanPrint    string `xml:"canprint,attr"`
 		CanShare    string `xml:"canshare,attr"`
 	} `xml:"usage"`
-	Comments int `xml:"comments"`
+	Comments int   `xml:"comments"`
+	Tags     []Tag `xml:"tags>tag"`
 	// Notes XXX: not handled yet
 	// People XXX: not handled yet
-	// Tags XXX: not handled yet
 	// Urls XXX: not handled yet
+}
+type Tag struct {
+	ID    string `xml:"id,attr"`
+	Raw   string `xml:"raw,attr"`
+	Value string `xml:",chardata"`
 }
 
 type PhotoInfoResponse struct {
@@ -70,6 +78,35 @@ const (
 	no  PrivacyType = 0
 )
 
+type PhotoDownloadInfo struct {
+	Label  string `xml:"label,attr"`
+	Width  string `xml:"width,attr"`
+	Height string `xml:"height,attr"`
+	Source string `xml:"source,attr"`
+	Url    string `xml:"url,attr"`
+	Media  string `xml:"media,attr"`
+}
+type PhotoAccessInfo struct {
+	flickr.BasicResponse
+	Sizes []PhotoDownloadInfo `xml:"sizes>size"`
+}
+
+// GetSizes get all the downloadable link as
+func GetSizes(client *flickr.FlickrClient, photoId string) (*PhotoAccessInfo, error) {
+
+	client.Init()
+	client.EndpointUrl = flickr.API_ENDPOINT
+	client.HTTPVerb = "POST"
+
+	client.Args.Set("method", "flickr.photos.getSizes")
+	client.Args.Set("photo_id", photoId)
+	client.OAuthSign()
+	response := &PhotoAccessInfo{}
+	err := flickr.DoPost(client, response)
+	return response, err
+
+}
+
 // Set permission of a photo from flickr
 // this method requires authentica with 'write' permission
 func SetPerms(client *flickr.FlickrClient, id string, isPublic PrivacyType, IsFriend PrivacyType, isFamily PrivacyType) (*flickr.BasicResponse, error) {
@@ -79,9 +116,9 @@ func SetPerms(client *flickr.FlickrClient, id string, isPublic PrivacyType, IsFr
 	client.HTTPVerb = "POST"
 	client.Args.Set("method", "flickr.photos.setPerms")
 	client.Args.Set("photo_id", id)
-	client.Args.Set("is_public", string(isPublic))
-	client.Args.Set("is_friend", string(IsFriend))
-	client.Args.Set("is_family", string(isFamily))
+	client.Args.Set("is_public", strconv.Itoa(int(isPublic)))
+	client.Args.Set("is_friend", strconv.Itoa(int(IsFriend)))
+	client.Args.Set("is_family", strconv.Itoa(int(isFamily)))
 	client.OAuthSign()
 	response := &flickr.BasicResponse{}
 	err := flickr.DoPost(client, response)
@@ -139,4 +176,17 @@ func SetDates(client *flickr.FlickrClient, id string, datePosted string, dateTak
 	response := &flickr.BasicResponse{}
 	err := flickr.DoPost(client, response)
 	return response, err
+}
+
+// AddTags add tags to an existing photo
+func AddTags(client *flickr.FlickrClient, photoId string, tags []string) error {
+	client.Init()
+	client.EndpointUrl = flickr.API_ENDPOINT
+	client.HTTPVerb = "POST"
+	client.Args.Set("method", "flickr.photos.addTags")
+	client.Args.Set("photo_id", photoId)
+	client.Args.Set("tags", strings.Join(tags, ","))
+	client.OAuthSign()
+	response := &flickr.BasicResponse{}
+	return flickr.DoPost(client, response)
 }
