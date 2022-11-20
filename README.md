@@ -149,6 +149,12 @@ These are methods that are not actually part of the Flickr API
 ### people
  * flickr.people.getPhotos
 
+ ### Groups 
+ * flickr.groups.pools.add
+ * flickr.groups.pools.getGroups
+ * flickr.groups.getInfo
+
+
 ### test
  * flickr.test.echo
  * flickr.test.login
