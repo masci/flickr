@@ -8,6 +8,86 @@ import (
 	flickErr "gopkg.in/masci/flickr.v2/error"
 )
 
+func TestGetGroups(t *testing.T) {
+	fclient := flickr.GetTestClient()
+	server, client := flickr.FlickrMock(200, getGroupsSamplePayload, "")
+	defer server.Close()
+	fclient.HTTPClient = client
+	resp, err := GetGroups(fclient, 0, 0)
+	_, ok := err.(*flickErr.Error)
+	flickr.Expect(t, ok, false)
+	assert.Greater(t, len(resp.Groups), 0, "The size of groups should be greater than zero")
+	assert.Equal(t, "ART", resp.Groups[0].Name, "First param should be Name")
+}
+
+func TestGetInfo(t *testing.T) {
+
+	fclient := flickr.GetTestClient()
+	server, client := flickr.FlickrMock(200, GroupInfoSample, "")
+	defer server.Close()
+	fclient.HTTPClient = client
+	resp, err := GetInfo(fclient, "123")
+	_, ok := err.(*flickErr.Error)
+	flickr.Expect(t, ok, false)
+	assert.NotNil(t, resp.Group.Restriction, "Restrictions can not be nil")
+	assert.Equal(t, "4", resp.Group.Throttle.Count, "The size of groups should be greater than zero")
+	assert.Equal(t, "1", resp.Group.Restriction.SafeOk, "First param should be Name")
+}
+
+func TestAddPhotoGroup(t *testing.T) {
+
+	fclient := flickr.GetTestClient()
+	server, client := flickr.FlickrMock(200, GroupInfoSample, "")
+	defer server.Close()
+	fclient.HTTPClient = client
+	_, err := AddPhoto(fclient, "123", "234")
+	flickr.Expect(t, err, nil)
+
+	server, client = flickr.FlickrMock(200, `<rsp stat="fail"></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+	resp, err := AddPhoto(fclient, "123456", "123")
+	_, ok := err.(*flickErr.Error)
+	flickr.Expect(t, ok, true)
+	flickr.Expect(t, resp.HasErrors(), true)
+
+	fclient = flickr.GetTestClient()
+	AddPhoto(fclient, "123456", "123")
+	params := []string{"photo_id", "group_id"}
+	flickr.AssertParamsInBody(t, fclient, params)
+
+}
+
+func TestCanAddPhotos(t *testing.T) {
+	groupInfoResponse := &GroupInfoResponse{}
+	groupInfoResponse.Group.Throttle.Remaining = "4"
+	flickr.Expect(t, groupInfoResponse.CanAddPhotos(), true)
+	groupInfoResponse.Group.Throttle.Remaining = "0"
+	flickr.Expect(t, groupInfoResponse.CanAddPhotos(), false)
+	groupInfoResponse.Group.Throttle.Remaining = ""
+	flickr.Expect(t, groupInfoResponse.CanAddPhotos(), false)
+}
+
+const GroupInfoSample = `<?xml version="1.0" encoding="utf-8" ?>
+<rsp stat="ok">
+  <group id="14743297@N22" nsid="14743297@N22" path_alias="_we_need_beauty_and_poetry" iconserver="65535" iconfarm="66" lang="" ispoolmoderated="1" photo_limit_opt_out="1" eighteenplus="1" invitation_only="0" is_member="1" is_moderator="0" is_admin="0" is_founder="0">
+    <name>we need poetry and beauty</name>
+    <description>La bellezza è un'esigenza del cuore, la poesia è la forza amorosa che la trasforma in qualcosa di immortale. Nelle foto che entreranno in questo gruppo si deve capire che il pulsante che ha scattato la foto non è stato controllato solo da un occhio, ma anche da un soffio d'amore. La tecnica conta poco, ma accetterò solo foto di profonda partecipazione del fotografo e della modella.</description>
+    <rules>1. Only female portraits and no faces of children 2. Remember to post, comment and invite when you would like to. 3. No foul language, insults etc. Please: respect! 4. Only submit FOUR PICTURES PER DAY. You can always come back the next day to post more. 5. No pornography, good erotic pictures are suitable. 6. The admin may block you, delete your pictures, etc without any warning. 7. The admin has the right to change the rules at any time without warning. 8 no pictures of violence or death. They will be removed. 9. Inclusion in the pool is very selective, subjective, offbeat, eclectic, and personal. 10. If you want comment what you see you can, but only with your words. &lt;b&gt;&lt;/b&gt;</rules>
+    <members>1104</members>
+    <pool_count>26047</pool_count>
+    <topic_count>6</topic_count>
+    <privacy>3</privacy>
+    <roles member="membri" moderator="marcomarchetto956" admin="amministratore" />
+    <datecreate>2020-04-04 08:23:27</datecreate>
+    <dateactivity>1667875715</dateactivity>
+    <blast date_blast_added="1666305761" user_id="161229264">Looking for so many beautiful pictures! The extraordinary feminine beauty that surrounds us is painted with poetry and with the thousand confetti of sensuality. This group needs you and your best photos! ....keep on posting...and don't be afraid of commenting and of being commented!  
+25577 25658</blast>
+    <throttle count="4" mode="day" remaining="4" />
+    <restrictions photos_ok="1" videos_ok="0" images_ok="1" screens_ok="0" art_ok="0" virtual_ok="0" safe_ok="1" moderate_ok="1" restricted_ok="1" has_geo="0" />
+  </group>
+</rsp>`
+
 const getGroupsSamplePayload = `<?xml version="1.0" encoding="utf-8" ?>
 <rsp stat="ok">
   <groups page="1" pages="1" per_page="400" total="268">
@@ -280,84 +360,4 @@ const getGroupsSamplePayload = `<?xml version="1.0" encoding="utf-8" ?>
     <group nsid="1099987@N20" id="1099987@N20" name="★★★Shutter Bug - Tips &amp; Tricks★★★" member="1" moderator="0" admin="0" privacy="3" photos="2140017" iconserver="3361" iconfarm="4" member_count="28593" topic_count="397" pool_count="2140017" />
     <group nsid="888631@N25" id="888631@N25" name="♥♥ People around us ♥♥" member="1" moderator="0" admin="0" privacy="3" photos="960446" iconserver="3062" iconfarm="4" member_count="11546" topic_count="20" pool_count="960446" />
   </groups>
-</rsp>`
-
-func TestGetGroups(t *testing.T) {
-	fclient := flickr.GetTestClient()
-	server, client := flickr.FlickrMock(200, getGroupsSamplePayload, "")
-	defer server.Close()
-	fclient.HTTPClient = client
-	resp, err := GetGroups(fclient, 0, 0)
-	_, ok := err.(*flickErr.Error)
-	flickr.Expect(t, ok, false)
-	assert.Greater(t, len(resp.Groups), 0, "The size of groups should be greater than zero")
-	assert.Equal(t, "ART", resp.Groups[0].Name, "First param should be Name")
-}
-
-func TestGetInfo(t *testing.T) {
-
-	fclient := flickr.GetTestClient()
-	server, client := flickr.FlickrMock(200, GroupInfoSample, "")
-	defer server.Close()
-	fclient.HTTPClient = client
-	resp, err := GetInfo(fclient, "123")
-	_, ok := err.(*flickErr.Error)
-	flickr.Expect(t, ok, false)
-	assert.NotNil(t, resp.Group.Restriction, "Restrictions can not be nil")
-	assert.Equal(t, "4", resp.Group.Throttle.Count, "The size of groups should be greater than zero")
-	assert.Equal(t, "1", resp.Group.Restriction.SafeOk, "First param should be Name")
-}
-
-func TestAddPhotoGroup(t *testing.T) {
-
-	fclient := flickr.GetTestClient()
-	server, client := flickr.FlickrMock(200, GroupInfoSample, "")
-	defer server.Close()
-	fclient.HTTPClient = client
-	_, err := AddPhoto(fclient, "123", "234")
-	flickr.Expect(t, err, nil)
-
-	server, client = flickr.FlickrMock(200, `<rsp stat="fail"></rsp>`, "text/xml")
-	defer server.Close()
-	fclient.HTTPClient = client
-	resp, err := AddPhoto(fclient, "123456", "123")
-	_, ok := err.(*flickErr.Error)
-	flickr.Expect(t, ok, true)
-	flickr.Expect(t, resp.HasErrors(), true)
-
-	fclient = flickr.GetTestClient()
-	AddPhoto(fclient, "123456", "123")
-	params := []string{"photo_id", "group_id"}
-	flickr.AssertParamsInBody(t, fclient, params)
-
-}
-
-func TestCanAddPhotos(t *testing.T) {
-	groupInfoResponse := &GroupInfoResponse{}
-	groupInfoResponse.Group.Throttle.Remaining = "4"
-	flickr.Expect(t, groupInfoResponse.CanAddPhotos(), true)
-	groupInfoResponse.Group.Throttle.Remaining = "0"
-	flickr.Expect(t, groupInfoResponse.CanAddPhotos(), false)
-	groupInfoResponse.Group.Throttle.Remaining = ""
-	flickr.Expect(t, groupInfoResponse.CanAddPhotos(), false)
-}
-
-const GroupInfoSample = `<?xml version="1.0" encoding="utf-8" ?>
-<rsp stat="ok">
-  <group id="14743297@N22" nsid="14743297@N22" path_alias="_we_need_beauty_and_poetry" iconserver="65535" iconfarm="66" lang="" ispoolmoderated="1" photo_limit_opt_out="1" eighteenplus="1" invitation_only="0" is_member="1" is_moderator="0" is_admin="0" is_founder="0">
-    <name>we need poetry and beauty</name>
-    <description>La bellezza è un'esigenza del cuore, la poesia è la forza amorosa che la trasforma in qualcosa di immortale. Nelle foto che entreranno in questo gruppo si deve capire che il pulsante che ha scattato la foto non è stato controllato solo da un occhio, ma anche da un soffio d'amore. La tecnica conta poco, ma accetterò solo foto di profonda partecipazione del fotografo e della modella.</description>
-    <rules>1. Only female portraits and no faces of children 2. Remember to post, comment and invite when you would like to. 3. No foul language, insults etc. Please: respect! 4. Only submit FOUR PICTURES PER DAY. You can always come back the next day to post more. 5. No pornography, good erotic pictures are suitable. 6. The admin may block you, delete your pictures, etc without any warning. 7. The admin has the right to change the rules at any time without warning. 8 no pictures of violence or death. They will be removed. 9. Inclusion in the pool is very selective, subjective, offbeat, eclectic, and personal. 10. If you want comment what you see you can, but only with your words. &lt;b&gt;&lt;/b&gt;</rules>
-    <members>1104</members>
-    <pool_count>26047</pool_count>
-    <topic_count>6</topic_count>
-    <privacy>3</privacy>
-    <roles member="membri" moderator="marcomarchetto956" admin="amministratore" />
-    <datecreate>2020-04-04 08:23:27</datecreate>
-    <dateactivity>1667875715</dateactivity>
-    <blast date_blast_added="1666305761" user_id="161229264">Looking for so many beautiful pictures! The extraordinary feminine beauty that surrounds us is painted with poetry and with the thousand confetti of sensuality. This group needs you and your best photos! ....keep on posting...and don't be afraid of commenting and of being commented!  
-25577 25658</blast>
-    <throttle count="4" mode="day" remaining="4" />
-    <restrictions photos_ok="1" videos_ok="0" images_ok="1" screens_ok="0" art_ok="0" virtual_ok="0" safe_ok="1" moderate_ok="1" restricted_ok="1" has_geo="0" />
-  </group>
 </rsp>`
