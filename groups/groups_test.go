@@ -287,7 +287,7 @@ func TestGetGroups(t *testing.T) {
 	server, client := flickr.FlickrMock(200, getGroupsSamplePayload, "")
 	defer server.Close()
 	fclient.HTTPClient = client
-	resp, err := GetGroups(fclient)
+	resp, err := GetGroups(fclient, 0, 0)
 	_, ok := err.(*flickErr.Error)
 	flickr.Expect(t, ok, false)
 	assert.Greater(t, len(resp.Groups), 0, "The size of groups should be greater than zero")
@@ -306,6 +306,40 @@ func TestGetInfo(t *testing.T) {
 	assert.NotNil(t, resp.Group.Restriction, "Restrictions can not be nil")
 	assert.Equal(t, "4", resp.Group.Throttle.Count, "The size of groups should be greater than zero")
 	assert.Equal(t, "1", resp.Group.Restriction.SafeOk, "First param should be Name")
+}
+
+func TestAddPhotoGroup(t *testing.T) {
+
+	fclient := flickr.GetTestClient()
+	server, client := flickr.FlickrMock(200, GroupInfoSample, "")
+	defer server.Close()
+	fclient.HTTPClient = client
+	_, err := AddPhoto(fclient, "123", "234")
+	flickr.Expect(t, err, nil)
+
+	server, client = flickr.FlickrMock(200, `<rsp stat="fail"></rsp>`, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+	resp, err := AddPhoto(fclient, "123456", "123")
+	_, ok := err.(*flickErr.Error)
+	flickr.Expect(t, ok, true)
+	flickr.Expect(t, resp.HasErrors(), true)
+
+	fclient = flickr.GetTestClient()
+	AddPhoto(fclient, "123456", "123")
+	params := []string{"photo_id", "group_id"}
+	flickr.AssertParamsInBody(t, fclient, params)
+
+}
+
+func TestCanAddPhotos(t *testing.T) {
+	groupInfoResponse := &GroupInfoResponse{}
+	groupInfoResponse.Group.Throttle.Remaining = "4"
+	flickr.Expect(t, groupInfoResponse.CanAddPhotos(), true)
+	groupInfoResponse.Group.Throttle.Remaining = "0"
+	flickr.Expect(t, groupInfoResponse.CanAddPhotos(), false)
+	groupInfoResponse.Group.Throttle.Remaining = ""
+	flickr.Expect(t, groupInfoResponse.CanAddPhotos(), false)
 }
 
 const GroupInfoSample = `<?xml version="1.0" encoding="utf-8" ?>

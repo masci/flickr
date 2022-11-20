@@ -68,18 +68,30 @@ func GetInfo(client *flickr.FlickrClient, groupId string) (*GroupInfoResponse, e
 	response := &GroupInfoResponse{}
 	err := flickr.DoPost(client, response)
 	return response, err
+
 }
-func GetGroups(client *flickr.FlickrClient) (*GetGroupsResponse, error) {
+
+// GetGroups Get all the groups for current user, ,currently it supports only fetching the first 400 groups
+func GetGroups(client *flickr.FlickrClient, page int, perPage int) (*GetGroupsResponse, error) {
+	// TODO impliment pagination
 	client.Init()
 	client.EndpointUrl = flickr.API_ENDPOINT
 	client.HTTPVerb = "POST"
+
 	client.Args.Set("method", "flickr.groups.pools.getGroups")
+	if page > 0 {
+		client.Args.Set("page", strconv.Itoa(page))
+	}
+	if page > 0 {
+		client.Args.Set("per_page", strconv.Itoa(perPage))
+	}
 	client.OAuthSign()
 	response := &GetGroupsResponse{}
 	err := flickr.DoPost(client, response)
 	return response, err
 }
 
+// AddPhoto  Add a photo to a particular group.
 func AddPhoto(client *flickr.FlickrClient, groupId, photoId string) (*flickr.BasicResponse, error) {
 	client.Init()
 	client.EndpointUrl = flickr.API_ENDPOINT
@@ -93,12 +105,9 @@ func AddPhoto(client *flickr.FlickrClient, groupId, photoId string) (*flickr.Bas
 	return response, err
 }
 
-/*func (group *GroupInfoResponse) GetSafetyLevel(safetyLevel int) bool {
-	restricted, err := strconv.Atoi(group.Group.Restriction.RestrictedOk)
-
-}*/
-
+// CanAddPhotos verify if the use can add more photos to the group or not
 func (group *GroupInfoResponse) CanAddPhotos() bool {
+	// TODO also validate the Throttle capacity for the day/week/month
 	val, err := strconv.Atoi(group.Group.Throttle.Remaining)
 	if err == nil {
 		return val > 0
