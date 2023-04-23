@@ -43,7 +43,7 @@ func main() {
 	if err != nil {
 		fmt.Println("Failed uploading:", err)
 		if resp != nil {
-			fmt.Println(resp.ErrorMsg)
+			fmt.Println(resp.ErrorMsg())
 		}
 		os.Exit(1)
 	} else {
