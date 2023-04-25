@@ -1,0 +1,24 @@
+name: "build-test"
+on: # rebuild any PRs and release branch
+  pull_request:
+  push:
+    branches:
+      - v*
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+
+      - name: Install goveralls
+        run: go install github.com/mattn/goveralls@latest
+
+      - name: Test
+        env:
+          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./runtests.sh
