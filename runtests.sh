@@ -22,4 +22,4 @@ done
 go tool cover -func profile.cov
 
 # Submit test coverage to coveralls.io
-goveralls -coverprofile=profile.cov -service=travis-ci
+goveralls -coverprofile=profile.cov -service=github
