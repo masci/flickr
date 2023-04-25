@@ -1,0 +1,19 @@
+name: "build-test"
+on: # rebuild any PRs and release branch
+  pull_request:
+  push:
+    branches:
+      - v*
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+
+      - name: Test
+        run: ./runtests.sh
