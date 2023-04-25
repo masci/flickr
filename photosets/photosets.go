@@ -30,8 +30,41 @@ type Photoset struct {
 }
 
 type Photo struct {
-	Id    string `xml:"id,attr"`
-	Title string `xml:"title,attr"`
+	Id             string `xml:"id,attr"`
+	Title          string `xml:"title,attr"`
+	Secret         string `xml:"secret,attr"`
+	OriginalSecret string `xml:"originalsecret,attr"`
+	OriginalFormat string `xml:"originalformat,attr"`
+	Server         int    `xml:"server,attr"`
+	Farm           int    `xml:"farm,attr"`
+	Isprimary      string `xml:"isprimary,attr"`
+	Ispublic       string `xml:"ispublic,attr"`
+	Isfriend       string `xml:"isfriend,attr"`
+	Isfamily       string `xml:"isfamily,attr"`
+	URLC           string `xml:"url_c,attr"` // URL of medium 800, 800 on longest size image
+	HeightC        string `xml:"height_c,attr"`
+	WidthC         string `xml:"width_c,attr"`
+	URLM           string `xml:"url_m,attr"` // URL of small, medium size image
+	HeightM        string `xml:"height_m,attr"`
+	WidthM         string `xml:"width_m,attr"`
+	URLN           string `xml:"url_n,attr"` // URL of small, 320 on longest side size image
+	HeightN        string `xml:"height_n,attr"`
+	WidthN         string `xml:"width_n,attr"`
+	URLO           string `xml:"url_o,attr"` // URL of original size image
+	HeightO        string `xml:"height_o,attr"`
+	WidthO         string `xml:"width_o,attr"`
+	URLQ           string `xml:"url_q,attr"` // URL of large square 150x150 size image
+	HeightQ        string `xml:"height_q,attr"`
+	WidthQ         string `xml:"width_q,attr"`
+	URLS           string `xml:"url_s,attr"` // URL of small square 75x75 size image
+	HeightS        string `xml:"height_s,attr"`
+	WidthS         string `xml:"width_s,attr"`
+	URLSQ          string `xml:"url_sq,attr"` // URL of small square 75x75 size image
+	HeightSQ       string `xml:"height_sq,attr"`
+	WidthSQ        string `xml:"width_sq,attr"`
+	URLT           string `xml:"url_t,attr"` // URL of thumbnail, 100 on longest side size image
+	HeightT        string `xml:"height_t,attr"`
+	WidthT         string `xml:"width_t,attr"`
 }
 
 type PhotosetsListResponse struct {
@@ -56,6 +89,7 @@ type PhotosListResponse struct {
 		Page    int     `xml:"page,attr"`
 		Pages   int     `xml:"pages,attr"`
 		Perpage int     `xml:"perpage,attr"`
+		Title   string  `xml:"title,attr"`
 		Total   int     `xml:"total,attr"`
 		Photos  []Photo `xml:"photo"`
 	} `xml:"photoset"`
@@ -155,6 +189,7 @@ func RemovePhoto(client *flickr.FlickrClient, photosetId, photoId string) (*flic
 func GetPhotos(client *flickr.FlickrClient, authenticate bool, photosetId, ownerID string, page int) (*PhotosListResponse, error) {
 	client.Init()
 	client.Args.Set("method", "flickr.photosets.getPhotos")
+	client.Args.Set("extras", "original_format,url_c,url_m,url_n,url_o,url_q,url_s,url_sq,url_t")
 	client.Args.Set("photoset_id", photosetId)
 	// this argument is optional but increases query performances
 	if ownerID != "" {
