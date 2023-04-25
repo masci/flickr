@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"gopkg.in/masci/flickr.v2"
+	"gopkg.in/masci/flickr.v3"
 )
 
 type PhotoList struct {

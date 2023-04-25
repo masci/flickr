@@ -3,8 +3,8 @@ package photos
 import (
 	"testing"
 
-	"gopkg.in/masci/flickr.v2"
-	flickErr "gopkg.in/masci/flickr.v2/error"
+	"gopkg.in/masci/flickr.v3"
+	flickErr "gopkg.in/masci/flickr.v3/error"
 )
 
 const photoInfo = `<?xml version="1.0" encoding="utf-8" ?>

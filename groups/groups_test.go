@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/masci/flickr.v2"
-	flickErr "gopkg.in/masci/flickr.v2/error"
+	"gopkg.in/masci/flickr.v3"
+	flickErr "gopkg.in/masci/flickr.v3/error"
 )
 
 func TestGetGroups(t *testing.T) {
@@ -81,7 +81,7 @@ const GroupInfoSample = `<?xml version="1.0" encoding="utf-8" ?>
     <roles member="membri" moderator="marcomarchetto956" admin="amministratore" />
     <datecreate>2020-04-04 08:23:27</datecreate>
     <dateactivity>1667875715</dateactivity>
-    <blast date_blast_added="1666305761" user_id="161229264">Looking for so many beautiful pictures! The extraordinary feminine beauty that surrounds us is painted with poetry and with the thousand confetti of sensuality. This group needs you and your best photos! ....keep on posting...and don't be afraid of commenting and of being commented!  
+    <blast date_blast_added="1666305761" user_id="161229264">Looking for so many beautiful pictures! The extraordinary feminine beauty that surrounds us is painted with poetry and with the thousand confetti of sensuality. This group needs you and your best photos! ....keep on posting...and don't be afraid of commenting and of being commented!
 25577 25658</blast>
     <throttle count="4" mode="day" remaining="4" />
     <restrictions photos_ok="1" videos_ok="0" images_ok="1" screens_ok="0" art_ok="0" virtual_ok="0" safe_ok="1" moderate_ok="1" restricted_ok="1" has_geo="0" />

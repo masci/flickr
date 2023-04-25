@@ -1,4 +1,4 @@
-module gopkg.in/masci/flickr.v2
+module gopkg.in/masci/flickr.v3
 
 go 1.20
 

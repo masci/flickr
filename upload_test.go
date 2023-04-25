@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	flickErr "gopkg.in/masci/flickr.v2/error"
+	flickErr "gopkg.in/masci/flickr.v3/error"
 )
 
 func TestNewUploadParams(t *testing.T) {
