@@ -7,14 +7,38 @@ import (
 )
 
 type Photo struct {
-	Id       string `xml:"id,attr"`
-	Owner    string `xml:"owner,attr"`
-	Secret   string `xml:"secret,attr"`
-	Server   string `xml:"server,attr"`
-	Title    string `xml:"title,attr"`
-	IsPublic bool   `xml:"ispublic,attr"`
-	IsFriend bool   `xml:"isfriend,attr"`
-	IsFamily bool   `xml:"isfamily,attr"`
+	DateTaken      string `xml:"datetaken,attr"`
+	DateUpload     string `xml:"dateupload,attr"`
+	Description    string `xml:"description"`
+	Geo            string `xml:"geo,attr"`
+	IconServer     string `xml:"iconserver,attr"`
+	Id             string `xml:"id,attr"`
+	IsFamily       bool   `xml:"isfamily,attr"`
+	IsFriend       bool   `xml:"isfriend,attr"`
+	IsPublic       bool   `xml:"ispublic,attr"`
+	LastUpdate     string `xml:"lastupdate,attr"`
+	License        string `xml:"license,attr"`
+	MachineTags    string `xml:"machine_tags,attr"`
+	Media          string `xml:"media,attr"`
+	OriginalFormat string `xml:"originalformat,attr"`
+	Owner          string `xml:"owner,attr"`
+	OwnerName      string `xml:"ownername,attr"`
+	PathAlias      string `xml:"pathalias,attr"`
+	Secret         string `xml:"secret,attr"`
+	Server         string `xml:"server,attr"`
+	Tags           string `xml:"tags,attr"`
+	Title          string `xml:"title,attr"`
+	URLC           string `xml:"url_c,attr"`  // medium 800
+	URLL           string `xml:"url_l,attr"`  // large
+	URLM           string `xml:"url_m,attr"`  // medium 500
+	URLN           string `xml:"url_n,attr"`  // small
+	URLO           string `xml:"url_o,attr"`  // URL of original size image
+	URLQ           string `xml:"url_q,attr"`  // large square
+	URLS           string `xml:"url_s,attr"`  // square
+	URLSQ          string `xml:"url_sq,attr"` // square
+	URLT           string `xml:"url_t,attr"`  // thumbnail
+	URLZ           string `xml:"url_z,attr"`  // medium 640
+	Views          string `xml:"views,attr"`
 }
 
 type Photos struct {
