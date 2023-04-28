@@ -38,9 +38,9 @@ type Photo struct {
 	Server         int    `xml:"server,attr"`
 	Farm           int    `xml:"farm,attr"`
 	Isprimary      string `xml:"isprimary,attr"`
-	Ispublic       string `xml:"ispublic,attr"`
-	Isfriend       string `xml:"isfriend,attr"`
-	Isfamily       string `xml:"isfamily,attr"`
+	IsPublic       string `xml:"ispublic,attr"`
+	IsFriend       string `xml:"isfriend,attr"`
+	IsFamily       string `xml:"isfamily,attr"`
 	URLC           string `xml:"url_c,attr"` // URL of medium 800, 800 on longest size image
 	HeightC        string `xml:"height_c,attr"`
 	WidthC         string `xml:"width_c,attr"`
