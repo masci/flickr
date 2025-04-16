@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	body = `<?xml version="1.0" encoding="utf-8" ?>
+	bodyGetPhotos = `<?xml version="1.0" encoding="utf-8" ?>
 		<rsp stat="ok">
 		<photos page="2" pages="89" perpage="10" total="881">
 		<photo id="2636" owner="47058503995@N01"
@@ -24,11 +24,18 @@ var (
 			ispublic="1" isfriend="0" isfamily="0" />
 	</photos>
 		</rsp>`
+
+	bodyFindByUsername = `<?xml version="1.0" encoding="utf-8" ?>
+	<rsp stat="ok">
+	  <user id="124533363@N04" nsid="124533363@N04">
+		<username>Klaus Ressmann</username>
+	  </user>
+	</rsp>`
 )
 
 func TestGetPhotos(t *testing.T) {
 	fclient := flickr.GetTestClient()
-	server, client := flickr.FlickrMock(200, body, "text/xml")
+	server, client := flickr.FlickrMock(200, bodyGetPhotos, "text/xml")
 	defer server.Close()
 	fclient.HTTPClient = client
 
@@ -59,6 +66,19 @@ func TestGetPhotos(t *testing.T) {
 		IsFriend: false,
 		IsFamily: false,
 	})
+}
+
+func TestFindByUsername(t *testing.T) {
+	fclient := flickr.GetTestClient()
+	server, client := flickr.FlickrMock(200, bodyFindByUsername, "text/xml")
+	defer server.Close()
+	fclient.HTTPClient = client
+
+	resp, err := FindByUsername(fclient, "Klaus Ressmann")
+	flickr.Expect(t, err, nil)
+	flickr.Expect(t, resp.User.Id, "124533363@N04")
+	flickr.Expect(t, resp.User.Nsid, "124533363@N04")
+	flickr.Expect(t, resp.User.Usernames[0], "Klaus Ressmann")
 }
 
 func TestGetPhotosExtras(t *testing.T) {

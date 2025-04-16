@@ -49,9 +49,20 @@ type Photos struct {
 	Photos  []Photo `xml:"photo"`
 }
 
+type User struct {
+	Id        string   `xml:"id,attr"`
+	Nsid      string   `xml:"nsid,attr"`
+	Usernames []string `xml:"username"`
+}
+
 type GetPhotosResponse struct {
 	flickr.BasicResponse
 	Photos Photos `xml:"photos"`
+}
+
+type FindByUsernameResponse struct {
+	flickr.BasicResponse
+	User User `xml:"user"`
 }
 
 type SafetyLevel int
@@ -140,10 +151,17 @@ func GetPhotos(client *flickr.FlickrClient,
 
 	response := &GetPhotosResponse{}
 	err := flickr.DoGet(client, response)
-	//	if err == nil {
-	//		fmt.Println("API response:", response.Extra)
-	//	} else {
-	//		fmt.Println("API error:", err)
-	//	}
+	return response, err
+}
+
+func FindByUsername(client *flickr.FlickrClient, username string) (*FindByUsernameResponse, error) {
+	client.Init()
+	client.EndpointUrl = flickr.API_ENDPOINT
+	client.Args.Set("method", "flickr.people.findByUsername")
+	client.Args.Set("username", username)
+	client.OAuthSign()
+
+	response := &FindByUsernameResponse{}
+	err := flickr.DoGet(client, response)
 	return response, err
 }

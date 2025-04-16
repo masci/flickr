@@ -148,6 +148,7 @@ These are methods that are not actually part of the Flickr API
 
 ### people
  * flickr.people.getPhotos
+ * flickr.people.findByUsername
 
  ### Groups
  * flickr.groups.pools.add
