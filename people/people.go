@@ -28,16 +28,25 @@ type Photo struct {
 	Server         string `xml:"server,attr"`
 	Tags           string `xml:"tags,attr"`
 	Title          string `xml:"title,attr"`
-	URLC           string `xml:"url_c,attr"`  // medium 800
-	URLL           string `xml:"url_l,attr"`  // large
-	URLM           string `xml:"url_m,attr"`  // medium 500
-	URLN           string `xml:"url_n,attr"`  // small
-	URLO           string `xml:"url_o,attr"`  // URL of original size image
-	URLQ           string `xml:"url_q,attr"`  // large square
-	URLS           string `xml:"url_s,attr"`  // square
-	URLSQ          string `xml:"url_sq,attr"` // square
-	URLT           string `xml:"url_t,attr"`  // thumbnail
-	URLZ           string `xml:"url_z,attr"`  // medium 640
+	URLB           string `xml:"url_b,attr"`   // large 1024
+	URLC           string `xml:"url_c,attr"`   // medium 800
+	URLF           string `xml:"url_f,attr"`   // extra large 4096 (2:1 aspect ratio only)
+	URLH           string `xml:"url_h,attr"`   // large 1600
+	URLK           string `xml:"url_k,attr"`   // large 2048
+	URL3K          string `xml:"url_3k,attr"`  // extra large 3072
+	URL4K          string `xml:"url_4k,attr"`  // extra large 4096
+	URL5K          string `xml:"url_5k,attr"`  // extra large 5120
+	URL6K          string `xml:"url_6k,attr"`  // extra large 6144
+	URLL           string `xml:"url_l,attr"`   // large (deprecated, use URLB)
+	URLM           string `xml:"url_m,attr"`   // medium 500
+	URLN           string `xml:"url_n,attr"`   // small 320
+	URLO           string `xml:"url_o,attr"`   // original
+	URLQ           string `xml:"url_q,attr"`   // large square 150
+	URLS           string `xml:"url_s,attr"`   // small square 75
+	URLSQ          string `xml:"url_sq,attr"`  // small square 75 (duplicate of URLS)
+	URLT           string `xml:"url_t,attr"`   // thumbnail 100
+	URLW           string `xml:"url_w,attr"`   // small 400
+	URLZ           string `xml:"url_z,attr"`   // medium 640
 	Views          string `xml:"views,attr"`
 }
 
